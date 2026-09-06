@@ -19,120 +19,136 @@ export default async function Home() {
   const onlinePlayers = servers.reduce((sum, server) => sum + Number(server.players || 0), 0);
   const capacity = servers.reduce((sum, server) => sum + Number(server.capacity || 0), 0);
   const occupancy = capacity ? Math.round((onlinePlayers / capacity) * 100) : 0;
+  const onlineServers = servers.filter((server) => server.state === "ONLINE").length;
 
-  const stats = [
-    { label: "Servers", value: String(servers.length || 0).padStart(2, "0"), icon: "server" as const },
-    { label: "Online", value: String(onlinePlayers), icon: "users" as const },
-    { label: "Occupancy", value: capacity ? `${occupancy}%` : "—", icon: "chart" as const },
-    { label: "Season", value: "S01", icon: "trophy" as const },
+  const metrics = [
+    { label: "Servers", value: String(onlineServers || servers.length).padStart(2, "0"), icon: "server" as const, tone: "blue" },
+    { label: "Players online", value: String(onlinePlayers), icon: "users" as const, tone: "mint" },
+    { label: "Occupancy", value: capacity ? `${occupancy}%` : "—", icon: "chart" as const, tone: "violet" },
+    { label: "Season", value: "S01", icon: "trophy" as const, tone: "amber" },
   ];
 
-  const shortcuts = [
-    { title: "Play", text: "Open live server browser", href: "/servers", icon: "server" as const, tone: "blue" },
-    { title: "Skinchanger", text: "Build and save your loadout", href: "/skinchanger", icon: "skin" as const, tone: "violet" },
-    { title: "Clans", text: "Teams, roster and rankings", href: "/clans", icon: "clan" as const, tone: "amber" },
-    { title: "Discord", text: "Community, support and news", href: config.discordUrl, icon: "discord" as const, tone: "discord" },
+  const quickLinks = [
+    { title: "Skinchanger", text: "Loadout studio", href: "/skinchanger", icon: "skin" as const, tone: "violet" },
+    { title: "Leaderboard", text: "Competitive ladder", href: "/leaderboard", icon: "trophy" as const, tone: "blue" },
+    { title: "Clans", text: "Teams & rosters", href: "/clans", icon: "clan" as const, tone: "amber" },
+    { title: "Membership", text: "Community tiers", href: "/membership", icon: "crown" as const, tone: "mint" },
   ];
 
   return (
-    <main className="page-wrap home-v9">
-      <section className="home-v9-hero">
-        <div className="home-v9-copy">
-          {config.announcement.enabled ? (
-            <SmartLink href={config.announcement.buttonHref} className="home-v9-notice">
-              <span>{config.announcement.badge}</span>
-              <strong>{config.announcement.title}</strong>
-              <Icon name="arrow" size={13} />
-            </SmartLink>
-          ) : null}
+    <main className="page-wrap home-v10">
+      {config.announcement.enabled ? (
+        <SmartLink href={config.announcement.buttonHref} className="v10-announcement">
+          <div><span>{config.announcement.badge}</span><strong>{config.announcement.title}</strong></div>
+          <Icon name="arrow" size={13} />
+        </SmartLink>
+      ) : null}
 
-          <span className="home-v9-kicker">WINGS / CS2 COMMUNITY</span>
-          <h1>Play. Build.<br /><em>Own your loadout.</em></h1>
-          <p>Competitive servers, custom loadouts, clans, staff болон community tools — нэг clean hub дотор.</p>
-
-          <div className="home-v9-actions">
-            <Link href="/servers" className="home-v9-primary">Play now <Icon name="arrow" size={14} /></Link>
-            <Link href="/skinchanger" className="home-v9-secondary"><Icon name="skin" size={16} /> Skinchanger</Link>
-            <a href={config.discordUrl} target="_blank" rel="noreferrer" className="home-v9-secondary discord"><Icon name="discord" size={17} /> Discord</a>
+      <section className="v10-hero">
+        <div className="v10-hero-bg" />
+        <div className="v10-hero-content">
+          <div className="v10-hero-copy">
+            <span className="v10-eyebrow">WINGS / CS2 COMMUNITY</span>
+            <h1>Play better.<br />Build your setup.</h1>
+            <p>Servers, loadouts, clans, rankings and community tools — нэг premium hub дотор.</p>
+            <div className="v10-actions">
+              <Link href="/servers" className="v10-primary">Play now <Icon name="arrow" size={14} /></Link>
+              <Link href="/skinchanger" className="v10-secondary"><Icon name="skin" size={15} /> Skinchanger</Link>
+              <a href={config.discordUrl} target="_blank" rel="noreferrer" className="v10-secondary discord"><Icon name="discord" size={16} /> Discord</a>
+            </div>
           </div>
 
-          <div className="home-v9-stats">
-            {stats.map((stat) => (
-              <article key={stat.label}>
-                <i><Icon name={stat.icon} size={17} /></i>
-                <div><span>{stat.label}</span><strong>{stat.value}</strong></div>
-              </article>
-            ))}
+          <div className="v10-hero-card">
+            <div className="v10-hero-card-head">
+              <div><span>NETWORK</span><strong>Live status</strong></div>
+              <b><i /> ONLINE</b>
+            </div>
+            <div className="v10-hero-card-grid">
+              <div><span>Players</span><strong>{onlinePlayers}</strong></div>
+              <div><span>Servers</span><strong>{servers.length}</strong></div>
+              <div><span>Slots</span><strong>{capacity || "—"}</strong></div>
+            </div>
+            <Link href="/servers" className="v10-hero-card-link">Browse servers <Icon name="arrow" size={13} /></Link>
           </div>
         </div>
-
-        <aside className="home-v9-live">
-          <div className="home-v9-live-head">
-            <div>
-              <span>LIVE SERVERS</span>
-              <h2>Find a match</h2>
-            </div>
-            <Link href="/servers">View all</Link>
-          </div>
-
-          <div className="home-v9-server-list">
-            {servers.length ? servers.slice(0, 4).map((server, index) => (
-              <article key={`${server.id}-${index}`}>
-                <div className="home-v9-server-index">{String(index + 1).padStart(2, "0")}</div>
-                <div className="home-v9-server-copy">
-                  <strong>{server.name}</strong>
-                  <small>{server.mode} · {server.map}</small>
-                </div>
-                <div className="home-v9-server-count"><b>{server.players}</b><span>/{server.capacity}</span></div>
-                <i className={server.state === "ONLINE" ? "online" : "offline"} />
-              </article>
-            )) : (
-              <div className="home-v9-empty">No servers connected yet.</div>
-            )}
-          </div>
-
-          <div className="home-v9-live-foot">
-            <span><i /> Network status</span>
-            <b>{servers.length ? "ONLINE" : "WAITING"}</b>
-          </div>
-        </aside>
       </section>
 
-      <section className="home-v9-shortcuts">
-        {shortcuts.map((item) => (
-          <SmartLink key={item.title} href={item.href} className={`home-v9-shortcut tone-${item.tone}`}>
-            <i><Icon name={item.icon} size={20} /></i>
-            <div><strong>{item.title}</strong><span>{item.text}</span></div>
-            <Icon name="arrow" size={14} />
-          </SmartLink>
+      <section className="v10-metrics">
+        {metrics.map((item) => (
+          <article key={item.label} className={`v10-metric tone-${item.tone}`}>
+            <i><Icon name={item.icon} size={17} /></i>
+            <div><span>{item.label}</span><strong>{item.value}</strong></div>
+          </article>
         ))}
       </section>
 
-      <section className="home-v9-bottom-grid">
-        <article className="home-v9-panel home-v9-featured">
-          <div>
+      <section className="v10-section">
+        <div className="v10-section-head">
+          <div><span>LIVE SERVERS</span><h2>Find your match</h2></div>
+          <Link href="/servers">View all <Icon name="arrow" size={13} /></Link>
+        </div>
+
+        <div className="v10-server-grid">
+          {servers.length ? servers.map((server, index) => {
+            const fill = server.capacity ? Math.min(100, Math.round((server.players / server.capacity) * 100)) : 0;
+            return (
+              <article key={`${server.id}-${index}`} className="v10-server-card">
+                <div className="v10-server-map">
+                  <span>{server.mode}</span>
+                  <small>{server.map}</small>
+                  <b>#{String(index + 1).padStart(2, "0")}</b>
+                </div>
+                <div className="v10-server-body">
+                  <div className="v10-server-title">
+                    <div><strong>{server.name}</strong><small>{server.map}</small></div>
+                    <i className={server.state === "ONLINE" ? "online" : "offline"} />
+                  </div>
+                  <div className="v10-server-progress"><i style={{ width: `${fill}%` }} /></div>
+                  <div className="v10-server-foot"><span>{server.players}/{server.capacity} players</span><b>{server.state}</b></div>
+                </div>
+              </article>
+            );
+          }) : <div className="v10-empty">No servers connected.</div>}
+        </div>
+      </section>
+
+      <section className="v10-content-grid">
+        <article className="v10-feature-card">
+          <div className="v10-feature-copy">
             <span>LOADOUT STUDIO</span>
-            <h2>Build your CS2 setup</h2>
-            <p>Weapons, knives, gloves, stickers, charms, agents, music kits болон medals нэг дор.</p>
-            <Link href="/skinchanger" className="home-v9-text-link">Open studio <Icon name="arrow" size={14} /></Link>
+            <h2>Build your CS2 identity</h2>
+            <p>Weapons, knives, gloves, stickers, charms, agents, music kits and medals.</p>
+            <Link href="/skinchanger">Open skinchanger <Icon name="arrow" size={13} /></Link>
           </div>
-          <div className="home-v9-feature-mark"><Icon name="skin" size={34} /></div>
+          <div className="v10-feature-visual">
+            <div className="v10-feature-orb"><Icon name="skin" size={34} /></div>
+          </div>
         </article>
 
-        <article className="home-v9-panel home-v9-community">
-          <div className="home-v9-live-head">
-            <div><span>COMMUNITY</span><h2>Stay connected</h2></div>
-          </div>
-          <div className="home-v9-community-links">
-            {config.cards.slice(0, 3).map((card) => (
-              <SmartLink href={card.href} key={card.title} className="home-v9-community-row">
-                <i><Icon name={card.icon} size={16} /></i>
-                <div><strong>{card.title}</strong><small>{card.text}</small></div>
+        <article className="v10-quick-panel">
+          <div className="v10-section-head compact"><div><span>DISCOVER</span><h2>Quick access</h2></div></div>
+          <div className="v10-quick-list">
+            {quickLinks.map((item) => (
+              <Link key={item.title} href={item.href} className={`v10-quick-row tone-${item.tone}`}>
+                <i><Icon name={item.icon} size={16} /></i>
+                <div><strong>{item.title}</strong><small>{item.text}</small></div>
                 <Icon name="arrow" size={13} />
-              </SmartLink>
+              </Link>
             ))}
           </div>
         </article>
+      </section>
+
+      <section className="v10-community-strip">
+        <div>
+          <span>WINGS COMMUNITY</span>
+          <strong>Stay connected with the server.</strong>
+        </div>
+        <div className="v10-community-actions">
+          <a href={config.discordUrl} target="_blank" rel="noreferrer"><Icon name="discord" size={16} /> Join Discord</a>
+          <Link href="/staff">Staff team</Link>
+          <Link href="/bans">Moderation</Link>
+        </div>
       </section>
     </main>
   );
