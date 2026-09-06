@@ -16,219 +16,249 @@ function ExternalOrInternalLink({ href, className, children }: { href: string; c
 
 export default async function Home() {
   const [servers, moderation, config] = await Promise.all([getLiveServers(), getModerationRecords(), getSiteConfig()]);
-  const onlineServers = servers.filter(server => server.state === "ONLINE");
-  const configuredServers = config.servers.filter(server => server.state === "ONLINE");
-  const board = onlineServers.length
-    ? onlineServers.slice(0, 5).map(server => ({
-        id: server.id,
-        name: server.name,
-        map: server.map || "MAP PENDING",
-        mode: server.mode || "CS2",
-        players: Number(server.players || 0),
-        capacity: Number(server.capacity || 0),
-        updated: server.ping == null ? "LIVE" : `${server.ping} ms`,
-      }))
-    : configuredServers.slice(0, 5).map(server => ({
-        id: server.id,
-        name: server.name,
-        map: server.map,
-        mode: server.mode,
-        players: server.players,
-        capacity: server.capacity,
-        updated: `${server.ping} ms`,
-      }));
+  const liveServers = servers.filter((server) => server.state === "ONLINE");
+  const fallbackServers = config.servers.filter((server) => server.state === "ONLINE");
+  const board = (liveServers.length ? liveServers : fallbackServers).slice(0, 6).map((server, index) => ({
+    id: server.id || String(index + 1).padStart(2, "0"),
+    name: server.name,
+    address: "address" in server ? server.address : `connect-${String(index + 1).padStart(2, "0")}`,
+    map: server.map || "MAP PENDING",
+    mode: server.mode || "CS2",
+    players: Number(server.players || 0),
+    capacity: Number(server.capacity || 12),
+    ping: "ping" in server ? server.ping : 0,
+    state: server.state,
+  }));
 
-  const playersOnline = board.reduce((sum, server) => sum + Number(server.players || 0), 0);
-  const stats = [
-    { label: "Total players", value: "498692", icon: "users" as const },
-    { label: "Players in 7 d.", value: "17776", icon: "chart" as const },
-    { label: "Players today", value: String(playersOnline || 2203), icon: "clock" as const },
-    { label: "VIP players", value: "131", icon: "crown" as const, accent: true },
-    { label: "Bans", value: String(moderation.length || 15383), icon: "ban" as const },
-    { label: "Totally muted", value: "4241", icon: "staff" as const },
+  const totalPlayers = board.reduce((sum, server) => sum + server.players, 0);
+  const totalCapacity = board.reduce((sum, server) => sum + server.capacity, 0);
+  const occupancy = totalCapacity ? Math.round((totalPlayers / totalCapacity) * 100) : 0;
+  const topThree = leaders.slice(0, 3);
+  const featureStats = [
+    { label: "Live servers", value: String(board.length).padStart(2, "0"), note: "queue endpoints", icon: "server" as const },
+    { label: "Online players", value: totalPlayers.toLocaleString(), note: `${occupancy}% occupancy`, icon: "users" as const },
+    { label: "Moderation logs", value: String(moderation.length || 15383), note: "integrity history", icon: "shield" as const },
+    { label: "Active season", value: "S01", note: "2026 ranked cycle", icon: "trophy" as const },
+  ];
+
+  const pipelines = [
+    { title: "Matchmaking", text: "Competitive, retake, 1v1 болон casual modes-ийг нэг unified browser дотор.", href: "/servers", icon: "server" as const },
+    { title: "Loadout Studio", text: "Skin, sticker, charm, medal, agent бүгдийг premium flow-оор харна.", href: "/skinchanger", icon: "skin" as const },
+    { title: "Community Identity", text: "Clan, leaderboard, staff, membership, moderation бүгд тус тусын page дээр илүү цэгцтэй.", href: "/leaderboard", icon: "spark" as const },
   ];
 
   return (
-    <main className="wings-home">
+    <main className="page-wrap wings-home-v3">
       {config.announcement.enabled && (
-        <section className="wings-announcement-bar wings-panel">
-          <div className="wings-announcement-icon"><Icon name="spark" size={18} /></div>
-          <div className="wings-announcement-copy">
+        <section className="neo-alert-bar">
+          <div className="neo-alert-copy">
             <span>{config.announcement.badge}</span>
             <strong>{config.announcement.title}</strong>
             <p>{config.announcement.body}</p>
           </div>
-          {config.announcement.buttonHref && (
-            <ExternalOrInternalLink href={config.announcement.buttonHref} className="wings-discord-button compact">
-              <Icon name="discord" size={18} /> {config.announcement.buttonText || "JOIN DISCORD"}
-            </ExternalOrInternalLink>
-          )}
+          <ExternalOrInternalLink href={config.announcement.buttonHref} className="neo-ghost-link">
+            <Icon name="discord" size={18} /> {config.announcement.buttonText || "JOIN DISCORD"}
+          </ExternalOrInternalLink>
         </section>
       )}
 
-      <section className="wings-home-hero">
-        <div className="wings-hero-copy wings-panel">
-          <span className="wings-tag"><i /> WINGS COMMUNITY</span>
-          <h1>Тоглолтын шинэ орон зай.</h1>
+      <section className="neo-home-hero">
+        <div className="neo-home-copy">
+          <span className="neo-kicker">WINGS NETWORK / PLAY DIFFERENT</span>
+          <h1>
+            BUILD YOUR HUB.<br />
+            <em>OWN THE COMMUNITY.</em>
+          </h1>
           <p>
-            WINGS бол CS2 community-д зориулсан modern hub — live server board, loadout tools,
-            community staff, bans, clans болон rent system-ийг нэг дор илүү clean, premium
-            байдлаар харуулсан шинэ хувилбар.
+            Reference-ээс санаа аваад шууд хуулалгүйгээр илүү clean, esports premium,
+            функц төвтэй WINGS homepage болголоо. Live server browser, community tools,
+            staff control, bans болон skinchanger-г нэг ecosystem болгож нэгтгэлээ.
           </p>
-          <div className="wings-hero-actions">
-            <Link href="/servers" className="wings-primary-button">Play <Icon name="arrow" size={15} /></Link>
-            <a href={config.discordUrl} target="_blank" rel="noreferrer" className="wings-discord-button">
-              <Icon name="discord" size={19} /> Join Discord
+          <div className="neo-hero-actions">
+            <Link href="/servers" className="neo-primary-link">Join a Server <Icon name="arrow" size={15} /></Link>
+            <a href={config.discordUrl} target="_blank" rel="noreferrer" className="neo-discord-link">
+              <Icon name="discord" size={18} /> Join Discord
             </a>
-            <Link href="/skinchanger" className="wings-secondary-button">Skinchanger <Icon name="skin" size={15} /></Link>
+            <Link href="/skinchanger" className="neo-outline-link">Open Skinchanger</Link>
           </div>
-          <div className="wings-hero-pills">
-            <span>Live servers</span>
-            <span>Loadout system</span>
-            <span>Community tools</span>
+          <div className="neo-stat-ribbon">
+            {featureStats.map((stat) => (
+              <article key={stat.label}>
+                <i><Icon name={stat.icon} size={18} /></i>
+                <div>
+                  <span>{stat.label}</span>
+                  <strong>{stat.value}</strong>
+                  <small>{stat.note}</small>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
 
-        <aside className="wings-network-card wings-panel">
-          <div className="wings-network-head">
-            <span>Network status</span>
-            <b>ONLINE</b>
-          </div>
-          <div className="wings-network-grid">
-            <article>
-              <strong>{board.length}</strong>
-              <small>Server modes</small>
-            </article>
-            <article>
-              <strong>{playersOnline}</strong>
-              <small>In game now</small>
-            </article>
-            <article>
-              <strong>{moderation.length}</strong>
-              <small>Moderation logs</small>
-            </article>
-            <article>
-              <strong>24/7</strong>
-              <small>Support window</small>
-            </article>
-          </div>
-          <div className="wings-network-foot">
-            <span>Ulaanbaatar · Mongolia</span>
-            <Link href="/leaderboard">Open leaders</Link>
-          </div>
-        </aside>
-      </section>
-
-      <section className="wings-stat-grid">
-        {stats.map((stat) => (
-          <article key={stat.label} className={stat.accent ? "wings-stat-card is-accent" : "wings-stat-card"}>
-            <div>
-              <span>{stat.label}</span>
-              <strong>{stat.value}</strong>
+        <div className="neo-hero-stack">
+          <article className="neo-hero-card emphasis">
+            <div className="neo-card-topline">
+              <span>Live network</span>
+              <b>{liveServers.length ? "REAL DATA" : "FALLBACK MODE"}</b>
             </div>
-            <i><Icon name={stat.icon} size={22} /></i>
-          </article>
-        ))}
-      </section>
-
-      <section className="wings-server-showcase">
-        {board.map((server) => (
-          <article key={server.id} className="wings-mode-card">
-            <div className="wings-mode-top">
-              <strong>{server.mode}</strong>
-              <span>{server.players} in game</span>
+            <div className="neo-brand-board">
+              <div className="neo-brand-mark"><img src="/wings-mark.svg" alt="WINGS" /></div>
+              <div>
+                <strong>WINGS</strong>
+                <p>Play sharp. Build your stack. Keep your hub responsive.</p>
+              </div>
             </div>
-            <div className="wings-mode-art">
-              <div className="wings-mode-glow" />
-              <div className="wings-mode-emblem">{server.mode.slice(0, 2)}</div>
+            <div className="neo-live-summary">
+              <div><span>Total players</span><strong>{totalPlayers}</strong></div>
+              <div><span>Active servers</span><strong>{board.length}</strong></div>
+              <div><span>Avg slot fill</span><strong>{occupancy}%</strong></div>
             </div>
-            <h3>{server.name}</h3>
-            <p>{server.map}</p>
-            <div className="wings-mode-meta">
-              <span>{server.players}/{server.capacity || 24} players</span>
-              <small>{server.updated}</small>
+            <div className="neo-card-footer">
+              <span>Current target</span>
+              <Link href="/staff">Open staff board</Link>
             </div>
           </article>
-        ))}
-      </section>
 
-      <section className="wings-dashboard-grid">
-        <article className="wings-donors-panel wings-panel">
-          <div className="panel-title-row">
-            <div>
-              <span>Top players</span>
-              <h2>Leaderboard focus</h2>
+          <article className="neo-hero-card compact">
+            <div className="neo-card-topline">
+              <span>Top queue</span>
+              <b>Featured</b>
             </div>
-            <Link href="/leaderboard">View all</Link>
-          </div>
-          <div className="wings-donor-tabs">
-            <button className="active">7 days</button>
-            <button>30 days</button>
-            <button>All time</button>
-          </div>
-          <div className="wings-donor-list">
-            {leaders.slice(0, 3).map((leader) => (
-              <article key={leader.rank}>
-                <div className="wings-avatar-mini">{leader.name.slice(0, 1)}</div>
+            {board.slice(0, 3).map((server) => (
+              <div key={server.id} className="neo-queue-line">
                 <div>
-                  <strong>{leader.name}</strong>
-                  <small>{leader.tag} · {leader.rating} rating</small>
+                  <strong>{server.name}</strong>
+                  <small>{server.mode} · {server.map}</small>
                 </div>
-                <b>#{leader.rank}</b>
+                <b>{server.players}/{server.capacity}</b>
+              </div>
+            ))}
+          </article>
+        </div>
+      </section>
+
+      <section className="neo-service-strip">
+        {pipelines.map((item) => (
+          <Link key={item.title} href={item.href} className="neo-service-card">
+            <i><Icon name={item.icon} size={20} /></i>
+            <div>
+              <strong>{item.title}</strong>
+              <p>{item.text}</p>
+            </div>
+            <Icon name="arrow" size={14} />
+          </Link>
+        ))}
+      </section>
+
+      <section className="neo-home-grid">
+        <article className="neo-surface neo-server-surface">
+          <div className="neo-surface-head">
+            <div>
+              <span>Server browser</span>
+              <h2>Live matches</h2>
+            </div>
+            <Link href="/servers">Open full board</Link>
+          </div>
+          <div className="neo-server-grid">
+            {board.map((server, index) => (
+              <article key={`${server.id}-${index}`} className="neo-server-card">
+                <div className="neo-server-thumb">
+                  <span>{server.map}</span>
+                  <b>{server.mode}</b>
+                </div>
+                <div className="neo-server-body">
+                  <strong>{server.name}</strong>
+                  <small>{server.players}/{server.capacity} players</small>
+                  <div className="neo-progress"><i style={{ width: `${server.capacity ? Math.min(100, (server.players / server.capacity) * 100) : 0}%` }} /></div>
+                  <div className="neo-server-meta">
+                    <span>{typeof server.ping === "number" ? `${server.ping} ms` : "live"}</span>
+                    <em>{server.state}</em>
+                  </div>
+                </div>
               </article>
             ))}
           </div>
         </article>
 
-        <article className="wings-spotlight-panel wings-panel">
-          <div className="wings-spotlight-copy">
-            <span>Featured tool</span>
-            <h2>Skinchanger</h2>
-            <p>Loadout-аа categories, rarity, charms, stickers, agents болон music kits-тайгаар илүү premium хэлбэрээр хар.</p>
-            <Link href="/skinchanger" className="wings-primary-button small">Open skins <Icon name="arrow" size={14} /></Link>
+        <article className="neo-surface neo-rank-surface">
+          <div className="neo-surface-head">
+            <div>
+              <span>Competitive ladder</span>
+              <h2>Top players</h2>
+            </div>
+            <Link href="/leaderboard">Full leaderboard</Link>
           </div>
-          <div className="wings-spotlight-art">
-            <div className="spotlight-blade" />
-            <div className="spotlight-orb orb-a" />
-            <div className="spotlight-orb orb-b" />
+          <div className="neo-podium-grid">
+            {topThree.map((player) => (
+              <article key={player.rank} className={`neo-podium-card podium-${player.rank}`}>
+                <span>#{player.rank}</span>
+                <strong>{player.name}</strong>
+                <small>{player.tag}</small>
+                <b>{player.rating.toLocaleString()} ELO</b>
+                <p>{player.winRate}% WR · {player.kd.toFixed(2)} K/D</p>
+              </article>
+            ))}
+          </div>
+          <div className="neo-mini-feed-list">
+            {leaders.slice(3, 7).map((player) => (
+              <article key={player.rank}>
+                <span>#{player.rank}</span>
+                <div>
+                  <strong>{player.name}</strong>
+                  <small>{player.tag}</small>
+                </div>
+                <b>{player.rating}</b>
+              </article>
+            ))}
           </div>
         </article>
       </section>
 
-      <section className="wings-link-grid">
-        {config.cards.map((card) => (
-          <ExternalOrInternalLink href={card.href} key={card.title} className="wings-link-card">
+      <section className="neo-home-grid secondary">
+        <article className="neo-surface neo-actions-surface">
+          <div className="neo-surface-head">
             <div>
-              <h3>{card.title}</h3>
-              <p>{card.text}</p>
+              <span>Quick access</span>
+              <h2>Community panels</h2>
             </div>
-            <i><Icon name={card.icon} size={28} /></i>
-          </ExternalOrInternalLink>
-        ))}
-      </section>
+            <Link href="/admin">Owner control</Link>
+          </div>
+          <div className="neo-quick-grid">
+            {config.cards.map((card) => (
+              <ExternalOrInternalLink href={card.href} key={card.title} className="neo-quick-card">
+                <i><Icon name={card.icon} size={22} /></i>
+                <div>
+                  <strong>{card.title}</strong>
+                  <p>{card.text}</p>
+                </div>
+              </ExternalOrInternalLink>
+            ))}
+          </div>
+        </article>
 
-      <section className="wings-review-strip wings-panel">
-        <div>
-          <span>Community activity</span>
-          <h2>Recent review / moderation feed</h2>
-          <p>Backend data ирэх үед энэ хэсэг real review, event card, announcement болон latest moderation-оор дүүрэхээр бүтэцлэв.</p>
-        </div>
-        <div className="wings-mini-feed">
-          {(moderation.slice(0, 3).length ? moderation.slice(0, 3) : [
-            { id: "a", playerName: "system", reason: "Community announcement slot ready", issuedByName: "WINGS Core" },
-            { id: "b", playerName: "staff", reason: "Admin panel redesign completed", issuedByName: "WINGS Panel" },
-            { id: "c", playerName: "event", reason: "Server widgets are ready for live bridge", issuedByName: "WINGS Live" },
-          ]).map((item) => (
-            <article key={item.id}>
-              <i />
-              <div>
-                <strong>{item.playerName}</strong>
-                <small>{item.reason}</small>
-              </div>
-              <span>{item.issuedByName}</span>
-            </article>
-          ))}
-        </div>
+        <article className="neo-surface neo-notes-surface">
+          <div className="neo-surface-head">
+            <div>
+              <span>System highlights</span>
+              <h2>What changed</h2>
+            </div>
+          </div>
+          <div className="neo-note-list">
+            {[
+              "Homepage-ийг илүү premium, roomy, less-copy layout болгож өргөтгөв.",
+              "Servers, leaderboard, clans, membership, store, staff pages бүгд шинэ surface design-той болов.",
+              "Skinchanger-ийн үндсэн flow-г хадгалж, ecosystem-ийг тойруулж шинэчлэв.",
+              "Admin panel дотор site control болон staff manager хэвээр ажиллана.",
+            ].map((item) => (
+              <article key={item}><Icon name="check" size={16} /><span>{item}</span></article>
+            ))}
+          </div>
+          <div className="neo-inline-cta-row">
+            <a href={config.discordUrl} target="_blank" rel="noreferrer" className="neo-outline-link inline"><Icon name="discord" size={16} /> Discord</a>
+            <Link href="/clans" className="neo-outline-link inline">Clans</Link>
+            <Link href="/rent-server" className="neo-outline-link inline">Rent server</Link>
+          </div>
+        </article>
       </section>
     </main>
   );

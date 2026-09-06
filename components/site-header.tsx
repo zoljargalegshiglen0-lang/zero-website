@@ -7,7 +7,7 @@ import { Icon } from "@/components/icon";
 import { navigation } from "@/lib/data";
 
 const navigationGroups = [
-  { title: "PLAY", routes: ["/", "/servers", "/leaderboard", "/clans"] },
+  { title: "CORE", routes: ["/", "/servers", "/leaderboard", "/clans"] },
   { title: "CUSTOMIZE", routes: ["/skinchanger", "/collection", "/membership", "/rent-server"] },
   { title: "CONTROL", routes: ["/staff", "/bans", "/admin"] },
 ];
@@ -46,28 +46,28 @@ export function SiteHeader() {
 
   return (
     <>
-      <div className="wings-utility-rail">
+      <div className="wings-utility-rail neo-utility-rail">
         <span><i /> WINGS NETWORK ONLINE</span>
-        <span>Ulaanbaatar / Mongolia</span>
-        <span>Season 01 · 2026</span>
+        <span>Premium CS2 community hub</span>
+        <span>Season 01 · Mongolia</span>
       </div>
 
-      <header className="wings-topbar">
+      <header className="wings-topbar neo-topbar">
         <div className="wings-topbar-left">
           <button className="nav-toggle" onClick={() => setOpen(!open)} aria-label="Цэс">
             <Icon name={open ? "close" : "menu"} />
           </button>
 
-          <Link className="wings-brand" href="/">
+          <Link className="wings-brand neo-brand" href="/">
             <span className="wings-brand-mark"><img src="/wings-mark.svg" alt="WINGS" /></span>
-            <span className="wings-brand-copy"><b>WINGS</b><small>CS2 COMMUNITY</small></span>
+            <span className="wings-brand-copy"><b>WINGS</b><small>COMMUNITY CONTROL HUB</small></span>
           </Link>
 
-          <div className="wings-live-pill"><i /> 282</div>
+          <div className="wings-live-pill neo-live-pill"><i /> Live</div>
         </div>
 
         <div className="wings-topbar-right">
-          <label className="wings-searchbox">
+          <label className="wings-searchbox neo-searchbox">
             <Icon name="search" size={16} />
             <input aria-label="Search player" placeholder="Search player" />
           </label>
@@ -90,8 +90,11 @@ export function SiteHeader() {
       {open && <button className="sidebar-backdrop" onClick={() => setOpen(false)} aria-label="Close navigation" />}
 
       <aside className={open ? "wings-sidebar open" : "wings-sidebar"}>
-        <div className="wings-sidebar-head">
-          <strong>Navigation</strong>
+        <div className="wings-sidebar-head neo-sidebar-head">
+          <div>
+            <strong>WINGS Navigation</strong>
+            <small>All pages and tools</small>
+          </div>
           <button className="wings-sidebar-close" onClick={() => setOpen(false)} aria-label="Хаах">
             <Icon name="close" size={14} />
           </button>
@@ -105,12 +108,7 @@ export function SiteHeader() {
                 .map((route) => navigation.find((item) => item.href === route) ?? (route === "/admin" ? { href: "/admin", label: "Admin", short: "Admin", icon: "admin" as const } : null))
                 .filter((item): item is NonNullable<typeof item> => Boolean(item))
                 .map((item) => (
-                  <Link
-                    key={item.href}
-                    className={path === item.href ? "active" : ""}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                  >
+                  <Link key={item.href} className={path === item.href ? "active" : ""} href={item.href} onClick={() => setOpen(false)}>
                     <i><Icon name={item.icon} size={16} /></i>
                     <span>{item.label}</span>
                     {item.href === "/skinchanger" || item.href === "/clans" ? <b className="wings-nav-badge">new</b> : null}
@@ -120,14 +118,20 @@ export function SiteHeader() {
           </section>
         ))}
 
-        <a className="wings-sidebar-discord" href={discordUrl} target="_blank" rel="noreferrer">
-          <i className="wings-sidebar-discord-icon"><Icon name="discord" size={24} /></i>
-          <div>
-            <span>COMMUNITY</span>
-            <strong>Join Discord</strong>
+        <div className="neo-sidebar-foot">
+          <a className="wings-sidebar-discord" href={discordUrl} target="_blank" rel="noreferrer">
+            <i className="wings-sidebar-discord-icon"><Icon name="discord" size={24} /></i>
+            <div>
+              <span>COMMUNITY</span>
+              <strong>Join Discord</strong>
+            </div>
+            <Icon name="arrow" size={16} />
+          </a>
+          <div className="neo-sidebar-mini-stats">
+            <article><strong>24/7</strong><span>support</span></article>
+            <article><strong>CS2</strong><span>hub</span></article>
           </div>
-          <Icon name="arrow" size={16} />
-        </a>
+        </div>
       </aside>
     </>
   );
