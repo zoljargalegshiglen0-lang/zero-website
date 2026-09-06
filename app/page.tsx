@@ -54,7 +54,6 @@ export default async function Home() {
             <div className="v10-actions">
               <Link href="/servers" className="v10-primary">Play now <Icon name="arrow" size={14} /></Link>
               <Link href="/skinchanger" className="v10-secondary"><Icon name="skin" size={15} /> Skinchanger</Link>
-              <a href={config.discordUrl} target="_blank" rel="noreferrer" className="v10-secondary discord"><Icon name="discord" size={16} /> Discord</a>
             </div>
           </div>
 
@@ -139,15 +138,15 @@ export default async function Home() {
         </article>
       </section>
 
-      <section className="v10-community-strip">
+      <section className="v10-community-strip v14-platform-strip">
         <div>
-          <span>WINGS COMMUNITY</span>
-          <strong>Stay connected with the server.</strong>
+          <span>WINGS PLATFORM</span>
+          <strong>Everything important, one clean place.</strong>
         </div>
         <div className="v10-community-actions">
-          <a href={config.discordUrl} target="_blank" rel="noreferrer"><Icon name="discord" size={16} /> Join Discord</a>
           <Link href="/staff">Staff team</Link>
           <Link href="/bans">Moderation</Link>
+          <Link href="/profile">Profile</Link>
         </div>
       </section>
     </main>

@@ -18,9 +18,6 @@ export default async function StaffPage() {
             <span>Public staff</span>
             <h2>Moderation and support team</h2>
           </div>
-          <a className="ghost-button" href="https://discord.gg/tFNYKQpHZe" target="_blank" rel="noreferrer">
-            <Icon name="discord" size={16} /> Join Discord
-          </a>
         </div>
 
         <div className="mono-card-grid three">

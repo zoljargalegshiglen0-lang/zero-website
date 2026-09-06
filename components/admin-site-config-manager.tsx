@@ -63,11 +63,7 @@ export function AdminSiteConfigManager({ initialConfig, writable }: { initialCon
       )}
 
       <div className="wings-config-grid">
-        <article className="wings-config-panel">
-          <header><Icon name="discord" size={19} /><div><span>COMMUNITY LINKS</span><strong>Discord & social</strong></div></header>
-          <label><span>DISCORD INVITE</span><input value={config.discordUrl} onChange={(e) => setConfig({ ...config, discordUrl: e.target.value })} /></label>
-          <label><span>INSTAGRAM URL</span><input value={config.instagramUrl} onChange={(e) => setConfig({ ...config, instagramUrl: e.target.value })} placeholder="https://instagram.com/..." /></label>
-        </article>
+
 
         <article className="wings-config-panel">
           <header><Icon name="spark" size={19} /><div><span>HOMEPAGE NOTICE</span><strong>Announcement manager</strong></div></header>

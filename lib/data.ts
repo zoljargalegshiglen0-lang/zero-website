@@ -9,7 +9,6 @@ export const navigation: { href: string; label: string; short: string; icon: Ico
   { href: "/bans", label: "Бан жагсаалт", short: "Bans", icon: "ban" },
   { href: "/skinchanger", label: "Skin Changer", short: "Changer", icon: "skin" },
   { href: "/collection", label: "Дэлгүүр", short: "Store", icon: "spark" },
-  { href: "/rent-server", label: "Сервер түрээс", short: "Rent", icon: "rent" },
   { href: "/staff", label: "Staff Team", short: "Staff", icon: "staff" },
 ];
 

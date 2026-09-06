@@ -19,7 +19,6 @@ export default function StorePage() {
             <span>Store modules</span>
             <h2>Ready for real products</h2>
           </div>
-          <Link href="/rent-server">Rent server</Link>
         </div>
 
         <div className="mono-card-grid three">

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
-import { getSiteConfig } from "@/lib/site-config";
 import "./globals.css";
 
 const title = "WINGS — CS2 Community";
@@ -20,20 +19,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const config = await getSiteConfig();
   return (
     <html lang="mn">
       <body className="antialiased cosmic-shell">
         <SiteHeader />
         {children}
         <footer className="site-footer wings-site-footer">
-          <Link className="logo wings-footer-brand" href="/"><span className="logo-mark"><img src="/wings-mark-mono.svg" alt="WINGS" /></span><span>WINGS<small>CS2 COMMUNITY</small></span></Link>
+          <Link className="logo wings-footer-brand" href="/"><span className="logo-mark"><img src="/wings-mark-aurora.svg" alt="WINGS" /></span><span>WINGS<small>CS2 COMMUNITY</small></span></Link>
           <nav>
             <Link href="/servers">SERVERS</Link>
             <Link href="/clans">CLANS</Link>
             <Link href="/staff">STAFF</Link>
-            <a href={config.discordUrl} target="_blank" rel="noreferrer">DISCORD</a>
-            {config.instagramUrl ? <a href={config.instagramUrl} target="_blank" rel="noreferrer">INSTAGRAM</a> : null}
           </nav>
           <span><i /> ULAANBAATAR · 2026</span>
         </footer>

@@ -105,3 +105,18 @@ Your plugin / backend should provide or forward:
 ## 6) Public page behavior
 
 If live data is not connected, the website now shows clean empty states instead of obvious fake stats.
+
+## Exact 3D weapon models
+
+The sticker editor now supports real `.glb` weapon models through the built-in model viewer.
+Put models you are licensed to use under:
+
+`public/models/cs2/<weapon-slug>.glb`
+
+Examples:
+- `ak-47.glb`
+- `m4a1-s.glb`
+- `awp.glb`
+- `usp-s.glb`
+
+If a GLB file is unavailable, the editor automatically falls back to the real catalog weapon image.

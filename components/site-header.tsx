@@ -8,36 +8,23 @@ import { navigation } from "@/lib/data";
 
 const navigationGroups = [
   { title: "CORE", routes: ["/", "/servers", "/leaderboard", "/clans"] },
-  { title: "CUSTOMIZE", routes: ["/skinchanger", "/collection", "/membership", "/rent-server"] },
+  { title: "CUSTOMIZE", routes: ["/skinchanger", "/collection", "/membership"] },
   { title: "CONTROL", routes: ["/staff", "/bans", "/admin"] },
 ];
 
 type HeaderSteamProfile = { name: string; avatar: string; steamId64: string };
-type PublicConfig = { discordUrl?: string };
 
 export function SiteHeader() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const [steamProfile, setSteamProfile] = useState<HeaderSteamProfile | null>(null);
-  const [discordUrl, setDiscordUrl] = useState("https://discord.gg/tFNYKQpHZe");
 
   useEffect(() => {
     let mounted = true;
-    Promise.all([
-      fetch("/api/auth/me", { cache: "no-store" }).then(async (response) => {
-        if (!response.ok) return null;
-        const data = await response.json();
-        return data?.profile ?? null;
-      }).catch(() => null),
-      fetch("/api/site-config", { cache: "no-store" }).then(async (response) => {
-        if (!response.ok) return null;
-        return response.json() as Promise<PublicConfig>;
-      }).catch(() => null),
-    ]).then(([profile, config]) => {
-      if (!mounted) return;
-      if (profile) setSteamProfile(profile);
-      if (config?.discordUrl) setDiscordUrl(config.discordUrl);
-    });
+    fetch("/api/auth/me", { cache: "no-store" })
+      .then(async (response) => response.ok ? response.json() : null)
+      .then((data) => { if (mounted && data?.profile) setSteamProfile(data.profile); })
+      .catch(() => null);
 
     return () => { mounted = false; };
   }, []);
@@ -55,7 +42,7 @@ export function SiteHeader() {
           </button>
 
           <Link className="wings-brand neo-brand" href="/">
-            <span className="wings-brand-mark"><img src="/wings-mark-mono.svg" alt="WINGS" /></span>
+            <span className="wings-brand-mark"><img src="/wings-mark-aurora.svg" alt="WINGS" /></span>
             <span className="wings-brand-copy"><b>WINGS</b><small>CS2 COMMUNITY HUB</small></span>
           </Link>
         </div>
@@ -65,10 +52,6 @@ export function SiteHeader() {
             <Icon name="search" size={16} />
             <input aria-label="Search player" placeholder="Search player" />
           </label>
-
-          <a href={discordUrl} target="_blank" rel="noreferrer" className="wings-topbar-discord">
-            <Icon name="discord" size={18} /> <span>Join Discord</span>
-          </a>
           <Link href="/collection" className="wings-topbar-button gold">Top up</Link>
           {steamProfile ? (
             <Link href="/profile" className="wings-profile-chip">
@@ -111,17 +94,6 @@ export function SiteHeader() {
             </nav>
           </section>
         ))}
-
-        <div className="neo-sidebar-foot simple">
-          <a className="wings-sidebar-discord" href={discordUrl} target="_blank" rel="noreferrer">
-            <i className="wings-sidebar-discord-icon"><Icon name="discord" size={20} /></i>
-            <div>
-              <span>COMMUNITY</span>
-              <strong>Join Discord</strong>
-            </div>
-            <Icon name="arrow" size={16} />
-          </a>
-        </div>
       </aside>
     </>
   );

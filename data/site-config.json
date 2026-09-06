@@ -6,20 +6,85 @@
     "badge": "WINGS UPDATE",
     "title": "WINGS шинэ season эхэллээ",
     "body": "Servers, skinchanger, clans болон community tools бүгд нэг дор.",
-    "buttonText": "JOIN DISCORD",
-    "buttonHref": "https://discord.gg/tFNYKQpHZe"
+    "buttonText": "OPEN SERVERS",
+    "buttonHref": "/servers"
   },
   "cards": [
-    { "title": "Server Rental", "text": "Private server, custom map, hourly rental.", "href": "/rent-server", "icon": "rent" },
-    { "title": "Discord Community", "text": "News, support, events and community chat.", "href": "https://discord.gg/tFNYKQpHZe", "icon": "discord" },
-    { "title": "Store", "text": "Membership, cosmetics and community items.", "href": "/collection", "icon": "crown" },
-    { "title": "Skinchanger", "text": "Skins, stickers, charms and complete loadouts.", "href": "/skinchanger", "icon": "skin" }
+    {
+      "title": "Skinchanger",
+      "text": "Skins, stickers, charms and loadouts.",
+      "href": "/skinchanger",
+      "icon": "skin"
+    },
+    {
+      "title": "Leaderboard",
+      "text": "Competitive ranking and player stats.",
+      "href": "/leaderboard",
+      "icon": "trophy"
+    },
+    {
+      "title": "Staff Team",
+      "text": "Community staff directory.",
+      "href": "/staff",
+      "icon": "staff"
+    },
+    {
+      "title": "Store",
+      "text": "Membership and community items.",
+      "href": "/collection",
+      "icon": "crown"
+    }
   ],
   "servers": [
-    { "id": "01", "name": "WINGS PREMIER #1", "mode": "PREMIER", "map": "ANCIENT", "players": 8, "capacity": 10, "ping": 12, "state": "ONLINE" },
-    { "id": "02", "name": "WINGS PREMIER #2", "mode": "PREMIER", "map": "MIRAGE", "players": 10, "capacity": 10, "ping": 9, "state": "ONLINE" },
-    { "id": "03", "name": "WINGS RETAKE", "mode": "RETAKE", "map": "INFERNO", "players": 6, "capacity": 12, "ping": 14, "state": "ONLINE" },
-    { "id": "04", "name": "WINGS 1V1 ARENA", "mode": "1V1", "map": "AIM_MAP", "players": 2, "capacity": 8, "ping": 11, "state": "ONLINE" },
-    { "id": "05", "name": "WINGS DEATHMATCH", "mode": "DEATHMATCH", "map": "DUST II", "players": 18, "capacity": 24, "ping": 16, "state": "ONLINE" }
+    {
+      "id": "01",
+      "name": "WINGS PREMIER #1",
+      "mode": "PREMIER",
+      "map": "ANCIENT",
+      "players": 8,
+      "capacity": 10,
+      "ping": 12,
+      "state": "ONLINE"
+    },
+    {
+      "id": "02",
+      "name": "WINGS PREMIER #2",
+      "mode": "PREMIER",
+      "map": "MIRAGE",
+      "players": 10,
+      "capacity": 10,
+      "ping": 9,
+      "state": "ONLINE"
+    },
+    {
+      "id": "03",
+      "name": "WINGS RETAKE",
+      "mode": "RETAKE",
+      "map": "INFERNO",
+      "players": 6,
+      "capacity": 12,
+      "ping": 14,
+      "state": "ONLINE"
+    },
+    {
+      "id": "04",
+      "name": "WINGS 1V1 ARENA",
+      "mode": "1V1",
+      "map": "AIM_MAP",
+      "players": 2,
+      "capacity": 8,
+      "ping": 11,
+      "state": "ONLINE"
+    },
+    {
+      "id": "05",
+      "name": "WINGS DEATHMATCH",
+      "mode": "DEATHMATCH",
+      "map": "DUST II",
+      "players": 18,
+      "capacity": 24,
+      "ping": 16,
+      "state": "ONLINE"
+    }
   ]
 }

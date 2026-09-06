@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { Icon } from "@/components/icon";
+import { Cs2ModelViewer } from "@/components/cs2-model-viewer";
 import { PageHeading } from "@/components/page-heading";
 import { cosmetics, type CosmeticItem } from "@/lib/data";
 
@@ -24,7 +25,7 @@ type CatalogItem = {
   image: string;
   team?: string;
 };
-type Placement = { item: CatalogItem; x: number; y: number; rotation: number; scale: number };
+type Placement = { item: CatalogItem; x: number; y: number; rotation: number; scale: number; scrape: number };
 type CraftState = { stickers: (Placement | null)[]; charm: CatalogItem | null; wear: number; pattern: number; statTrak: boolean; nameTag: string };
 type SavedLoadout = { version: 2; equipped: Record<string, CatalogItem>; crafts: Record<string, CraftState> };
 type LoadoutGroup = { label: string; slots: readonly string[] };
@@ -198,8 +199,8 @@ export default function SkinChangerPage() {
   const [remoteTotals, setRemoteTotals] = useState<Partial<Record<FeedKey, number>>>({});
   const [side, setSide] = useState<TeamSide>("CT");
   const [category, setCategory] = useState<BoardCategory>("Skins");
-  const [group, setGroup] = useState("ALL");
-  const [boardView, setBoardView] = useState<"loadout" | "catalog">("loadout");
+  const [group, setGroup] = useState("RIFLES");
+  const [boardView, setBoardView] = useState<"loadout" | "catalog">("catalog");
   const [selectedBase, setSelectedBase] = useState<string | null>(null);
   const [boardQuery, setBoardQuery] = useState("");
   const [skinQuery, setSkinQuery] = useState("");
@@ -223,6 +224,9 @@ export default function SkinChangerPage() {
   const [draggingPreview, setDraggingPreview] = useState(false);
   const previewDragRef = useRef({ x: 0, y: 0, rx: -4, ry: 0 });
   const [draggedSticker, setDraggedSticker] = useState<CatalogItem | null>(null);
+  const [armedSticker, setArmedSticker] = useState<CatalogItem | null>(null);
+  const [previewZoom, setPreviewZoom] = useState(112);
+  const [inspectSide, setInspectSide] = useState<"right" | "left">("right");
   const [notice, setNotice] = useState("");
   const [steamAuthed, setSteamAuthed] = useState<boolean | null>(null);
   const [steamId64, setSteamId64] = useState("");
@@ -429,6 +433,7 @@ export default function SkinChangerPage() {
   function openLoadoutShortcut(next: typeof loadoutShortcuts[number]) {
     switchCategory(next.category);
     setGroup(next.group);
+    setBoardView("catalog");
   }
 
   function sideCount(team: TeamSide) {
@@ -465,6 +470,9 @@ export default function SkinChangerPage() {
     setAccessoryQuery("");
     setAccessoryLimit(48);
     setAccessoryTab("stickers");
+    setArmedSticker(null);
+    setPreviewZoom(112);
+    setInspectSide("right");
     setStickers(saved?.stickers?.length ? saved.stickers : Array(5).fill(null));
     setCharm(saved?.charm ?? null);
     setWear(saved?.wear ?? 60);
@@ -473,22 +481,25 @@ export default function SkinChangerPage() {
     setNameTag(saved?.nameTag ?? "");
   }
 
-  function addSticker(item: CatalogItem) {
+  function armStickerPlacement(item: CatalogItem) {
     const slot = selectedSlot ?? stickers.findIndex(entry => entry === null);
     if (slot < 0) {
       flash("5 sticker slot дүүрсэн байна");
       return;
     }
-    setStickers(previous => previous.map((entry, index) => index === slot ? { item, x: 50, y: 50, rotation: 0, scale: 100 } : entry));
     setSelectedSlot(slot);
+    setArmedSticker(item);
+    flash("Preview дээр дарж sticker наана");
   }
 
-  function updatePlacement(property: "x" | "y" | "rotation" | "scale", value: number) {
+
+  function updatePlacement(property: "x" | "y" | "rotation" | "scale" | "scrape", value: number) {
     if (selectedSlot === null) return;
     setStickers(previous => previous.map((entry, index) => index === selectedSlot && entry ? { ...entry, [property]: value } : entry));
   }
 
   function beginPreviewRotate(event: ReactPointerEvent<HTMLDivElement>) {
+    if (armedSticker) return;
     if ((event.target as HTMLElement).closest(".preview-sticker-dot")) return;
     setDraggingPreview(true);
     previewDragRef.current = { x: event.clientX, y: event.clientY, rx: previewRotation.x, ry: previewRotation.y };
@@ -508,8 +519,9 @@ export default function SkinChangerPage() {
     const y = Math.max(8, Math.min(92, ((clientY - rect.top) / rect.height) * 100));
     const slot = selectedSlot ?? stickers.findIndex(entry => entry === null);
     if (slot < 0) return flash("5 sticker slot дүүрсэн байна");
-    setStickers(previous => previous.map((entry, index) => index === slot ? { item, x, y, rotation: 0, scale: 100 } : entry));
+    setStickers(previous => previous.map((entry, index) => index === slot ? { item, x, y, rotation: 0, scale: 100, scrape: 0 } : entry));
     setSelectedSlot(slot);
+    setArmedSticker(null);
   }
 
   function dragPlacedSticker(event: ReactPointerEvent<HTMLButtonElement>, index: number) {
@@ -527,6 +539,45 @@ export default function SkinChangerPage() {
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
   }
+
+  function clickPreviewStage(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!armedSticker) return;
+    placeStickerAt(armedSticker, event.clientX, event.clientY, event.currentTarget);
+  }
+
+  function moveStickerToPreset(x: number, y: number) {
+    if (armedSticker) {
+      const slot = selectedSlot ?? stickers.findIndex(entry => entry === null);
+      if (slot < 0) return flash("5 sticker slot дүүрсэн байна");
+      setStickers(previous => previous.map((entry, index) => index === slot ? { item: armedSticker, x, y, rotation: 0, scale: 100, scrape: 0 } : entry));
+      setSelectedSlot(slot);
+      setArmedSticker(null);
+      return;
+    }
+    if (selectedSlot === null || !stickers[selectedSlot]) return;
+    updatePlacement("x", x);
+    updatePlacement("y", y);
+  }
+
+  function stickerPresetPoints() {
+    return [
+      { label: "FRONT", x: 73, y: 39 },
+      { label: "BODY", x: 53, y: 49 },
+      { label: "MAG", x: 46, y: 60 },
+      { label: "REAR", x: 28, y: 44 },
+    ];
+  }
+
+  function stickerVisual(entry: Placement) {
+    const scrape = entry.scrape ?? 0;
+    return {
+      opacity: Math.max(0.38, 1 - scrape * 0.0055),
+      filter: `saturate(${Math.max(0.15, 1 - scrape * 0.008)}) brightness(${Math.max(0.62, 1 - scrape * 0.0036)}) contrast(${1 - scrape * 0.0015})`,
+    };
+  }
+
+  const weaponWearFilter = `drop-shadow(0 24px 24px rgba(0,0,0,.48)) saturate(${Math.max(0.72, 1 - wear / 2000)}) contrast(${Math.max(0.82, 1 - wear / 3600)}) brightness(${Math.max(0.76, 1 - wear / 2800)}) hue-rotate(${(pattern % 24) - 12}deg)`;
+  const wearOverlay = Math.min(.3, wear / 2400);
 
   function categoryCount(id: BoardCategory) {
     if (id === "Skins") return catalog.skins.filter(item => item.kind === "Skins").length;
@@ -547,89 +598,91 @@ export default function SkinChangerPage() {
     setBoardQuery("");
     setSkinQuery("");
     setGroup("ALL");
-    setBoardView(nextCategory === "Skins" ? "loadout" : "catalog");
+    setBoardView("catalog");
   }
 
   function renderSpecialPanel(team: TeamSide) {
-    return <aside className={`cs2-side-panel ${team.toLowerCase()} ${side === team ? "active" : ""}`}>
-      <button className={`side-panel-hero ${teamAgentPreview[team]?.image ? "has-agent" : ""}`} onClick={() => openSpecialCategory("Agents", team)}>
-        {teamAgentPreview[team]?.image && <img className="side-agent-image" src={teamAgentPreview[team]!.image} alt={cleanName(teamAgentPreview[team]!)} loading="lazy" referrerPolicy="no-referrer" />}
-        <div className="side-panel-copy">
-          <span className="side-panel-tag">EQUIP {team}</span>
-          <strong>{teamAgentPreview[team] ? cleanName(teamAgentPreview[team]!) : team === "CT" ? "DEFAULT CT AGENT" : "DEFAULT T AGENT"}</strong>
-          <small>{teamAgentPreview[team]?.rarity ?? `${sideCount(team)} EQUIPPED`}</small>
+    const agent = teamAgentPreview[team];
+    const entries = [
+      {
+        key: `${team}-Agents`,
+        label: "AGENT",
+        title: agent ? cleanName(agent) : `${team} agent not selected`,
+        note: agent?.rarity ?? `${sideCount(team)} equipped`,
+        category: "Agents" as BoardCategory,
+        item: agent,
+      },
+      ...specialPanels.map(panel => {
+        const item = equipped[slotKey(team, panel.category)];
+        return {
+          key: `${team}-${panel.category}`,
+          label: panel.label,
+          title: item ? cleanName(item) : panel.category === "Knives" ? "No knife skin" : panel.category === "Gloves" ? "No gloves selected" : panel.category === "Music Kits" ? "No music kit" : "No medal selected",
+          note: item?.rarity ?? "Optional",
+          category: panel.category,
+          item,
+        };
+      }),
+    ];
+
+    return <section className="skin-v11-special-rail">
+      <header>
+        <div>
+          <span>{team} SPECIAL LOADOUT</span>
+          <strong>Agent · Knife · Gloves · Extras</strong>
         </div>
-        <b>{team}</b>
-      </button>
-      <div className="side-panel-specials">
-        {specialPanels.map(panel => {
-          const item = equipped[slotKey(team, panel.category)];
-          return <button key={`${team}-${panel.category}`} className={`side-special-card ${category === panel.category && side === team ? "active" : ""}`} style={{ "--item-color": equippedColor(item) } as CSSProperties} onClick={() => openSpecialCategory(panel.category, team)}>
-            <div>
-              <span>{panel.label}</span>
-              <strong>{item ? cleanName(item) : panel.category === "Agents" ? `DEFAULT ${team} AGENT` : panel.category === "Knives" ? "VANILLA KNIFE" : panel.category === "Gloves" ? "DEFAULT GLOVES" : `DEFAULT ${panel.label}`}</strong>
-              <small>{item ? item.rarity : panel.teamAware ? `TEAM ${team}` : "LOADOUT"}</small>
-            </div>
-            {item?.image ? <CatalogThumb item={item} className="side-special-thumb" /> : <i>{panel.label[0]}</i>}
-          </button>;
-        })}
+        <button className="ghost-button" onClick={() => switchSide(team)}>{team} SIDE</button>
+      </header>
+      <div className="skin-v11-special-grid">
+        {entries.map(entry => <button key={entry.key} className={`skin-v11-special-card ${category === entry.category && side === team ? "active" : ""}`} style={{ "--item-color": equippedColor(entry.item ?? undefined) } as CSSProperties} onClick={() => openSpecialCategory(entry.category, team)}>
+          <div className="skin-v11-special-copy">
+            <span>{entry.label}</span>
+            <strong>{entry.title}</strong>
+            <small>{entry.note}</small>
+          </div>
+          {entry.item?.image ? <CatalogThumb item={entry.item} className="skin-v11-special-thumb" /> : <i>{entry.label[0]}</i>}
+        </button>)}
       </div>
-    </aside>;
+    </section>;
   }
 
-  return <main className={`page-wrap changer-page pro-changer-page ${steamAuthed === false ? "skinchanger-locked" : ""}`}>
-    {steamAuthed === false && <div className="steam-skin-gate"><div className="steam-skin-gate-card"><span><Icon name="steam" size={28} /></span><small>WINGS LOADOUT ACCESS</small><strong>STEAM LOGIN REQUIRED</strong><p>Skin Changer болон SteamID64-д хадгалагдах loadout ашиглахын тулд Steam-ээр нэвтэрнэ үү.</p><a href="/login">SIGN IN WITH STEAM <Icon name="arrow" size={15} /></a></div></div>}
+  return <main className="page-wrap changer-page pro-changer-page">
+    {steamAuthed === false && <div className="skin-v14-login-note"><Icon name="steam" size={16} /><span>Demo mode · Steam login хийвэл loadout save / sync ажиллана.</span><a href="/login">SIGN IN</a></div>}
     <PageHeading icon="skin" eyebrow="LOADOUT STUDIO" title="SKINCHANGER" description="Steam-saved loadout · live catalog · plugin bridge ready" />
 
-    <section className="skin-v8-shell">
-      <div className="skin-v8-topbar">
-        <div className="skin-v8-brandline">
-          <span>WINGS LOADOUT</span>
-          <strong>{side} SIDE</strong>
-          <small>{catalogState === "live" ? "LIVE CATALOG" : catalogState === "loading" ? "SYNCING" : "LOCAL CATALOG"}</small>
+    <section className="skin-v14-commandbar">
+      <div className="skin-v14-command-head">
+        <div>
+          <span>LOADOUT</span>
+          <strong>{side} · {category === "Skins" ? group : category}</strong>
+          <small>{catalogState === "live" ? "Live catalog" : catalogState === "loading" ? "Syncing catalog" : "Catalog ready"}</small>
         </div>
-        <div className="skin-v8-top-actions">
+        <div className="skin-v14-side-switch">
           <button className={side === "CT" ? "active" : ""} onClick={() => switchSide("CT")}>CT</button>
           <button className={side === "T" ? "active" : ""} onClick={() => switchSide("T")}>T</button>
-          <button onClick={() => { setCategory("Skins"); setGroup("ALL"); setBoardView("loadout"); setBoardQuery(""); }}>LOADOUT</button>
-          <button onClick={() => openSpecialCategory("Knives", side)}>KNIVES</button>
-          <button onClick={() => openSpecialCategory("Agents", side)}>AGENTS</button>
         </div>
       </div>
-
-      <div className="skin-v8-focus-row">
-        <article className="skin-v8-active-card" style={activeLoadoutItem ? rarityStyle(activeLoadoutItem) : undefined}>
-          <div className="skin-v8-active-art">
-            {activeLoadoutItem ? <CatalogThumb item={activeLoadoutItem} className="skin-v8-active-thumb" /> : <span><Icon name="skin" size={30} /></span>}
-          </div>
-          <div className="skin-v8-active-copy">
-            <span>ACTIVE ITEM</span>
-            <strong>{activeLoadoutItem ? cleanName(activeLoadoutItem) : `${side} LOADOUT`}</strong>
-            <small>{activeLoadoutItem?.weapon || `${equippedCount} equipped items`}</small>
-          </div>
-        </article>
-
-        <div className="skin-v8-metrics">
-          <article><span>EQUIPPED</span><strong>{equippedCount}</strong></article>
-          <article><span>CATALOG</span><strong>{catalogTotal.toLocaleString()}</strong></article>
-          <article><span>WEAPON SLOTS</span><strong>{teamSlotCount}</strong></article>
-          <article><span>STEAM</span><strong>{steamAuthed ? "LINKED" : "LOGIN"}</strong></article>
+      <nav className="skin-v14-primary-nav" aria-label="Skinchanger categories">
+        <button className={category === "Skins" && group === "ALL" ? "active" : ""} onClick={() => { setCategory("Skins"); setGroup("ALL"); setBoardView("catalog"); setBoardQuery(""); }}>WEAPONS</button>
+        <button className={category === "Skins" && group === "PISTOLS" ? "active" : ""} onClick={() => openLoadoutShortcut(loadoutShortcuts[0])}>PISTOLS</button>
+        <button className={category === "Skins" && group === "SMGS" ? "active" : ""} onClick={() => openLoadoutShortcut(loadoutShortcuts[1])}>SMG</button>
+        <button className={category === "Skins" && group === "RIFLES" ? "active" : ""} onClick={() => openLoadoutShortcut(loadoutShortcuts[2])}>RIFLES</button>
+        <button className={category === "Knives" ? "active" : ""} onClick={() => openSpecialCategory("Knives", side)}>KNIFE</button>
+        <button className={category === "Gloves" ? "active" : ""} onClick={() => openSpecialCategory("Gloves", side)}>GLOVES</button>
+        <button className={category === "Agents" ? "active" : ""} onClick={() => openSpecialCategory("Agents", side)}>AGENT</button>
+        <button className={category === "Music Kits" ? "active" : ""} onClick={() => openSpecialCategory("Music Kits", side)}>MUSIC</button>
+        <button className={category === "Medals" ? "active" : ""} onClick={() => openSpecialCategory("Medals", side)}>MEDAL</button>
+      </nav>
+      <div className="skin-v14-current-strip">
+        <div className="skin-v14-current-item" style={activeLoadoutItem ? rarityStyle(activeLoadoutItem) : undefined}>
+          {activeLoadoutItem?.image ? <CatalogThumb item={activeLoadoutItem} /> : <i><Icon name="skin" size={18} /></i>}
+          <div><span>CURRENT</span><strong>{activeLoadoutItem ? cleanName(activeLoadoutItem) : "No skin selected"}</strong><small>{activeLoadoutItem?.weapon || `${equippedCount} equipped`}</small></div>
         </div>
-      </div>
-
-      <div className="skin-v8-catalog-line">
-        <div><i className={catalogState} /><span>{remoteTotals.skins ?? catalog.skins.length} skins</span><b /> <span>{remoteTotals.stickers ?? catalog.stickers.length} stickers</span><b /> <span>{catalog.charms.length} charms</span></div>
-        <small>Saved loadouts sync through /api/loadout and optional CS2 bridge.</small>
+        <div className="skin-v14-current-meta"><span>{equippedCount} EQUIPPED</span><span>{steamAuthed ? "STEAM LINKED" : "STEAM LOGIN"}</span></div>
       </div>
     </section>
 
-    <section className="pro-loadout-shell">
-      <section className="team-loadout-switch" aria-label="CT болон T loadout сонголт">
-        <button className={`team-side-card team-ct ${side === "CT" ? "active" : ""}`} onClick={() => switchSide("CT")}><i><Icon name="shield" size={20} /></i><div><span>COUNTER-TERRORISTS</span><strong>CT LOADOUT</strong><small>{sideCount("CT")} EQUIPPED</small></div><b>CT</b></button>
-        <nav className="loadout-shortcuts" aria-label="Loadout slots">{loadoutShortcuts.map(item => <button key={item.label} className={category === item.category && (item.category !== "Skins" || group === item.group) ? "active" : ""} onClick={() => openLoadoutShortcut(item)}><i /><span>{item.label}<small>{item.note}</small></span></button>)}</nav>
-        <button className={`team-side-card team-t ${side === "T" ? "active" : ""}`} onClick={() => switchSide("T")}><b>T</b><div><span>TERRORISTS</span><strong>T LOADOUT</strong><small>{sideCount("T")} EQUIPPED</small></div><i><Icon name="spark" size={20} /></i></button>
-      </section>
-
+    <section className="pro-loadout-shell skin-v14-shell">
       <div className="pro-loadout-body">
         {selectedBase && <div className="skin-picker-overlay" role="presentation" onClick={event => { if (event.target === event.currentTarget) setSelectedBase(null); }}>
           <section className="loadout-picker-drawer skin-picker-modal" role="dialog" aria-modal="true" aria-label={`${selectedBase} skin selection`}>
@@ -648,21 +701,22 @@ export default function SkinChangerPage() {
         </div>}
 
         <section className="pro-catalog-board loadout-board-full">
-          <header className="pro-board-toolbar"><div><span>{side} / {category === "Skins" ? "LOADOUT" : `${category.toUpperCase()} SELECT`}</span><strong>{category === "Agents" || category === "Music Kits" || category === "Medals" ? directItems.length : baseItems.length}</strong></div><div className="pro-board-actions">{category !== "Skins" && <button className="loadout-back-button" onClick={() => { setCategory("Skins"); setSelectedBase(null); setBoardQuery(""); setSkinQuery(""); setGroup("ALL"); setBoardView("loadout"); }}>← LOADOUT</button>}{category === "Skins" && <nav className="catalog-view-switch" aria-label="Loadout view"><button className={boardView === "loadout" ? "active" : ""} onClick={() => { setBoardView("loadout"); setGroup("ALL"); setBoardQuery(""); }}>LOADOUT</button><button className={boardView === "catalog" ? "active" : ""} onClick={() => setBoardView("catalog")}>ALL ITEMS</button></nav>}<label className="pro-search"><Icon name="search" size={14} /><input value={boardQuery} onChange={event => { setBoardQuery(event.target.value); setBoardLimit(120); }} placeholder="Catalog хайх..." /></label></div></header>
+          <header className="pro-board-toolbar"><div><span>{side} / {category === "Skins" ? "LOADOUT" : `${category.toUpperCase()} SELECT`}</span><strong>{category === "Agents" || category === "Music Kits" || category === "Medals" ? directItems.length : baseItems.length}</strong></div><div className="pro-board-actions">{category !== "Skins" && <button className="loadout-back-button" onClick={() => { setCategory("Skins"); setSelectedBase(null); setBoardQuery(""); setSkinQuery(""); setGroup("RIFLES"); setBoardView("catalog"); }}>← WEAPONS</button>}<label className="pro-search"><Icon name="search" size={14} /><input value={boardQuery} onChange={event => { setBoardQuery(event.target.value); setBoardLimit(120); }} placeholder="Catalog хайх..." /></label></div></header>
           {category === "Skins" && <nav className="pro-group-tabs">{groups.map(item => <button key={item} className={group === item ? "active" : ""} onClick={() => setGroup(item)}>{item}</button>)}</nav>}
 
-          {showTeamLoadout ? <section className="cs2-loadout-stage">
-            {renderSpecialPanel("CT")}
+          {showTeamLoadout ? <section className="cs2-loadout-stage v11">
+            <div className="skin-v11-loadout-main">
             <section className={`match-loadout-board side-${side.toLowerCase()}`} aria-label={`${side} loadout`}>
-              <header className="match-loadout-heading"><div><span>ACTIVE SIDE</span><strong>{side === "CT" ? "COUNTER-TERRORIST" : "TERRORIST"} LOADOUT</strong></div><small>{sideCount(side)} / {teamSlotCount} EQUIPPED</small></header>
+              <header className="match-loadout-heading compact"><div><span>ACTIVE SIDE</span><strong>{side === "CT" ? "COUNTER-TERRORIST" : "TERRORIST"} LOADOUT</strong></div><small>{sideCount(side)} equipped</small></header>
               <div className="match-loadout-groups">{visibleTeamLoadout.map(section => <section key={section.label} className={`match-loadout-section section-${section.label.toLowerCase().replace(/\s+/g, "-")}`}><header><span>{section.label}</span><i /><small>{section.slots.length}</small></header><div className="match-loadout-slots">{section.slots.map(name => {
                 const selected = equipped[`${side}:Skins:${name}`];
                 const preview = weaponPreviewByName.get(name.trim().toLowerCase());
-                return <button key={name} className={`match-loadout-slot ${selectedBase === name ? "focused" : ""} ${selected && selected.rarity !== "Default" ? "equipped" : ""}`} style={{ "--item-color": equippedColor(selected) } as CSSProperties} onClick={() => chooseLoadoutSlot(name)}>{selected?.image ? <CatalogThumb item={selected} className="loadout-slot-thumb" /> : preview?.image ? <CatalogThumb item={preview} className="loadout-slot-thumb vanilla-preview" /> : <span className="loadout-slot-mark">{initials(name)}</span>}<span><strong>{name}</strong><small>{selected ? cleanName(selected) : "DEFAULT"}</small></span>{selected && selected.rarity !== "Default" && <i />}</button>;
+                return <button key={name} className={`match-loadout-slot compact ${selectedBase === name ? "focused" : ""} ${selected && selected.rarity !== "Default" ? "equipped" : ""}`} style={{ "--item-color": equippedColor(selected) } as CSSProperties} onClick={() => chooseLoadoutSlot(name)}>{selected?.image ? <CatalogThumb item={selected} className="loadout-slot-thumb" /> : <span className="loadout-slot-mark">{initials(name)}</span>}<span><strong>{name}</strong><small>{selected ? cleanName(selected) : preview?.finish ? `Default · ${preview.finish}` : "No skin selected"}</small></span>{selected && selected.rarity !== "Default" && <i />}</button>;
               })}</div></section>)}</div>
             </section>
-            {renderSpecialPanel("T")}
-          </section> : <div className="pro-catalog-grid">
+            </div>
+            {renderSpecialPanel(side)}
+          </section> : <div className="pro-catalog-grid compact-grid">
             {(category === "Skins" || category === "Knives" || category === "Gloves") ? baseItems.map(item => {
               const selected = category === "Skins" ? equipped[slotKey(side, category, item.name)] : Object.values(equipped).find(entry => entry && entry.kind === category && sameText(entry.weapon, item.name) && true) && equipped[slotKey(side, category)];
               const activeSelected = category === "Skins" ? selected : (equipped[slotKey(side, category)] && sameText(equipped[slotKey(side, category)].weapon, item.name) ? equipped[slotKey(side, category)] : undefined);
@@ -670,7 +724,7 @@ export default function SkinChangerPage() {
               return <article key={item.name} className={`pro-item-card ${selectedBase === item.name ? "focused" : ""} ${(activeSelected ?? selected) && (activeSelected ?? selected)!.rarity !== "Default" ? "equipped" : "vanilla-item"}`} style={{ "--item-color": equippedColor((activeSelected ?? selected) || undefined) } as CSSProperties}><button onClick={() => chooseBase(item.name)}>{item.source && item.image ? <CatalogThumb item={item.source} className="item-aurora-glyph" /> : <span className="item-aurora-glyph"><i>{initials(item.name)}</i><b /></span>}<div><small>{(activeSelected ?? selected) && (activeSelected ?? selected)!.rarity !== "Default" ? (activeSelected ?? selected)!.rarity : item.group}</small><strong>{item.name}</strong><em>{(activeSelected ?? selected) ? cleanName((activeSelected ?? selected)!) : `${count} SKINS`}</em></div></button>{(activeSelected ?? selected) && (activeSelected ?? selected)!.rarity !== "Default" && <button className="card-settings" onClick={() => openEditor((activeSelected ?? selected)!, slotKey(side, category, item.name))} aria-label="Configure selected skin"><Icon name="settings" size={14} /></button>}</article>;
             }) : directItems.slice(0, boardLimit).map(item => {
               const selected = equipped[slotKey(side, category)]?.id === item.id;
-              return <article key={item.id} className={`pro-item-card direct ${selected ? "focused equipped" : ""}`} style={rarityStyle(item)}><button onClick={() => { equip(item, slotKey(side, category)); setCategory("Skins"); setBoardQuery(""); setGroup("ALL"); setBoardView("loadout"); }}><CatalogThumb item={item} className="item-aurora-glyph" /><div><small>{item.rarity}</small><strong>{cleanName(item)}</strong><em>{item.collection}</em></div></button></article>;
+              return <article key={item.id} className={`pro-item-card direct ${selected ? "focused equipped" : ""}`} style={rarityStyle(item)}><button onClick={() => { equip(item, slotKey(side, category)); setCategory("Skins"); setBoardQuery(""); setGroup("RIFLES"); setBoardView("catalog"); }}><CatalogThumb item={item} className="item-aurora-glyph" /><div><small>{item.rarity}</small><strong>{cleanName(item)}</strong><em>{item.collection}</em></div></button></article>;
             })}
           </div>}
 
@@ -681,46 +735,51 @@ export default function SkinChangerPage() {
       </div>
     </section>
 
-    {editorItem && <div className="pro-editor-overlay" role="presentation" onClick={event => { if (event.target === event.currentTarget) setEditorItem(null); setEditorKey(null); }}><section className="pro-editor-modal" role="dialog" aria-modal="true" aria-label="Cosmetic settings">
-      <header className="pro-editor-heading"><div><span>COSMETIC SETTINGS</span><strong>{editorItem.name}</strong></div><button onClick={() => { setEditorItem(null); setEditorKey(null); }} aria-label="Close editor"><Icon name="close" size={16} /></button></header>
+    {editorItem && <div className="pro-editor-overlay" role="presentation" onClick={event => { if (event.target === event.currentTarget) setEditorItem(null); setEditorKey(null); setArmedSticker(null); }}><section className="pro-editor-modal" role="dialog" aria-modal="true" aria-label="Cosmetic settings">
+      <header className="pro-editor-heading"><div><span>COSMETIC SETTINGS</span><strong>{editorItem.name}</strong></div><button onClick={() => { setEditorItem(null); setEditorKey(null); setArmedSticker(null); }} aria-label="Close editor"><Icon name="close" size={16} /></button></header>
       <div className="pro-editor-layout">
         <section className="craft-preview-panel fullscreen-craft-preview">
-          <div className="fake-3d-stage" style={rarityStyle(editorItem)}
+          <div className={`fake-3d-stage ${armedSticker ? "sticker-placing" : ""}`} style={rarityStyle(editorItem)}
             onPointerDown={beginPreviewRotate} onPointerMove={movePreviewRotate} onPointerUp={() => setDraggingPreview(false)} onPointerCancel={() => setDraggingPreview(false)}
+            onClick={clickPreviewStage}
             onDragOver={event => event.preventDefault()} onDrop={event => { event.preventDefault(); if (draggedSticker) placeStickerAt(draggedSticker, event.clientX, event.clientY, event.currentTarget); setDraggedSticker(null); }}>
             <span className="preview-grid" />
-            <div className="preview-identity"><small>3D PREVIEW · DRAG TO ROTATE</small><strong>{editorItem.weapon || editorItem.kind} | {cleanName(editorItem)}</strong><em>{editorItem.rarity}</em></div>
-            <div className="fake-3d-object" style={{ transform: `perspective(1100px) rotateX(${previewRotation.x}deg) rotateY(${previewRotation.y}deg)` }}>
+            <div className="preview-identity"><small>{armedSticker ? "STICKER MODE · CLICK ANYWHERE TO APPLY" : "3D PREVIEW · DRAG TO ROTATE"}</small><strong>{editorItem.weapon || editorItem.kind} | {cleanName(editorItem)}</strong><em>{editorItem.rarity}</em></div>
+            <div className="preview-stage-toolbar" onClick={event => event.stopPropagation()}><label><span>ZOOM</span><input type="range" min="90" max="145" value={previewZoom} onChange={event => setPreviewZoom(Number(event.target.value))} /></label><div className="inspect-toggle"><button className={inspectSide === "left" ? "active" : ""} onClick={() => setInspectSide("left")}>LEFT</button><button className={inspectSide === "right" ? "active" : ""} onClick={() => setInspectSide("right")}>RIGHT</button></div>{armedSticker && <button onClick={event => { event.stopPropagation(); setArmedSticker(null); }}>CANCEL STICKER</button>}</div>
+            {armedSticker && <div className="placement-hint" onClick={event => event.stopPropagation()}><CatalogThumb item={armedSticker} /><span>Click anywhere on the weapon to place this sticker</span></div>}
+            <div className="fake-3d-object" style={{ transform: `perspective(1100px) rotateX(${previewRotation.x}deg) rotateY(${previewRotation.y}deg) scaleX(${inspectSide === "left" ? -1 : 1}) scale(${previewZoom / 100})` }}>
               <span className="fake-3d-depth" />
-              {editorItem.image ? <CatalogThumb item={editorItem} className="preview-weapon-image fake-model-image" /> : <span className="preview-core">{initials(editorItem.weapon || editorItem.name)}</span>}
+              {editorItem.image ? <div className="preview-weapon-image fake-model-image"><Cs2ModelViewer weapon={editorItem.weapon || editorItem.name} poster={editorItem.image} alt={cleanName(editorItem)} /></div> : <span className="preview-core">{initials(editorItem.weapon || editorItem.name)}</span>}
+              <span className="weapon-wear-overlay" style={{ opacity: wearOverlay, background: `linear-gradient(${(pattern % 180)}deg, rgba(255,255,255,.08), rgba(0,0,0,.32))` }} />
             </div>
-            {editorItem.kind === "Skins" && stickers.map((entry, index) => entry && <button key={index} className={`preview-sticker-dot ${selectedSlot === index ? "selected" : ""}`} style={{ left: `${entry.x}%`, top: `${entry.y}%`, transform: `translate(-50%,-50%) rotate(${entry.rotation}deg) scale(${entry.scale / 100})` }} onPointerDown={event => dragPlacedSticker(event, index)}><CatalogThumb item={entry.item} /></button>)}
+            {editorItem.kind === "Skins" && stickers.map((entry, index) => entry && <button key={index} className={`preview-sticker-dot ${selectedSlot === index ? "selected" : ""}`} style={{ left: `${entry.x}%`, top: `${entry.y}%`, transform: `translate(-50%,-50%) rotate(${entry.rotation}deg) scale(${entry.scale / 100})`, ...stickerVisual(entry) }} title={`Scrape ${entry.scrape ?? 0}%`} onPointerDown={event => dragPlacedSticker(event, index)}><CatalogThumb item={entry.item} /></button>)}
             {editorItem.kind === "Skins" && charm && <span className="preview-charm"><CatalogThumb item={charm} /></span>}
-            <div className="preview-meta"><span>FLOAT {floatValue}</span><span>PATTERN #{pattern}</span><span>{statTrak ? "STATTRAK" : "STANDARD"}</span></div>
+            <div className="preview-meta"><span>FLOAT {floatValue} · {wearName}</span><span>PATTERN #{pattern}</span><span>{inspectSide.toUpperCase()} INSPECT · {statTrak ? "STATTRAK" : "STANDARD"}</span></div>
             <button className="reset-3d" onClick={event => { event.stopPropagation(); setPreviewRotation({ x: -4, y: 0 }); }}>RESET VIEW</button>
           </div>
-          <p>Зэвсгийг mouse-аар чирээд 360° эргүүлнэ. Sticker-ээ доорх catalog-оос preview дээр чирж тавиад, наасан sticker-ээ mouse-аар шууд зөөнө.</p>
+          <p>CS2 шиг sticker workflow: sticker slot сонгоно → sticker дээр дарна → том preview model дээр хүссэн цэг дээрээ дарж наана. Наасан sticker-ээ mouse-аар чирж reposition хийж болно.</p>
         </section>
 
         <section className="pro-editor-controls">
           {editorItem.kind === "Skins" && <>
           <div className="editor-control-head"><span>STICKER CRAFT</span><strong>{stickerCount}/5</strong></div>
+          <div className="sticker-place-help"><small>{armedSticker ? `READY TO PLACE: ${cleanName(armedSticker)}` : "Choose a slot, then click a sticker to enter placement mode."}</small></div>
           <div className="pro-sticker-slots">{stickers.map((entry, index) => <button key={index} className={`${entry ? "filled" : ""} ${selectedSlot === index ? "active" : ""}`} onClick={() => { setSelectedSlot(index); setAccessoryTab("stickers"); }}>{entry ? <CatalogThumb item={entry.item} /> : <Icon name="plus" size={14} />}</button>)}</div>
-          {selectedPlacement && <div className="placement-card drag-placement-card"><div><strong>{cleanName(selectedPlacement.item)}</strong><button onClick={() => { setStickers(previous => previous.map((entry, index) => index === selectedSlot ? null : entry)); setSelectedSlot(null); }}>REMOVE</button></div><p>Sticker-ээ preview дээр mouse-аар drag хийнэ.</p><div className="sticker-transform-buttons"><button onClick={() => updatePlacement("rotation", selectedPlacement.rotation - 15)}>↶ ROTATE</button><button onClick={() => updatePlacement("rotation", selectedPlacement.rotation + 15)}>ROTATE ↷</button><button onClick={() => updatePlacement("scale", Math.max(50, selectedPlacement.scale - 10))}>− SIZE</button><button onClick={() => updatePlacement("scale", Math.min(180, selectedPlacement.scale + 10))}>+ SIZE</button></div></div>}
+          {selectedPlacement && <div className="placement-card drag-placement-card"><div><strong>{cleanName(selectedPlacement.item)}</strong><button onClick={() => { setStickers(previous => previous.map((entry, index) => index === selectedSlot ? null : entry)); setSelectedSlot(null); }}>REMOVE</button></div><p>Sticker-ээ preview дээр mouse-аар drag хийнэ, эсвэл quick preset ашиглаж reposition хийж болно.</p><div className="sticker-transform-buttons"><button onClick={() => updatePlacement("rotation", selectedPlacement.rotation - 15)}>↶ ROTATE</button><button onClick={() => updatePlacement("rotation", selectedPlacement.rotation + 15)}>ROTATE ↷</button><button onClick={() => updatePlacement("scale", Math.max(50, selectedPlacement.scale - 10))}>− SIZE</button><button onClick={() => updatePlacement("scale", Math.min(180, selectedPlacement.scale + 10))}>+ SIZE</button></div><div className="sticker-presets">{stickerPresetPoints().map(point => <button key={point.label} onClick={() => moveStickerToPreset(point.x, point.y)}>{point.label}</button>)}</div><label className="pro-editor-range scrape-range"><span>SCRAPE<b>{selectedPlacement.scrape ?? 0}%</b></span><input type="range" min="0" max="100" step="5" value={selectedPlacement.scrape ?? 0} onChange={event => updatePlacement("scrape", Number(event.target.value))} /><small>Sticker scrape demo effect</small></label></div>}
           </>}
           <label className="pro-editor-range"><span>FLOAT<b>{floatValue}</b></span><input type="range" min="0" max="1000" value={wear} onChange={event => setWear(Number(event.target.value))} /><small>{wearName}</small></label>
           <label className="pro-editor-range"><span>PATTERN<b>#{pattern}</b></span><input type="range" min="0" max="999" value={pattern} onChange={event => setPattern(Number(event.target.value))} /></label>
           {editorItem.kind !== "Gloves" && <label className="name-tag-field"><span>NAME TAG <b>{nameTag.length}/20</b></span><input maxLength={20} value={nameTag} onChange={event => setNameTag(event.target.value)} placeholder="Custom NameTag" /></label>}
           {editorItem.kind !== "Gloves" && <button className={`stattrak-toggle ${statTrak ? "active" : ""}`} onClick={() => setStatTrak(value => !value)}><span>STATTRAK™</span><i /></button>}
           {editorItem.kind === "Skins" && <div className="charm-row"><span>CHARM</span><button onClick={() => setAccessoryTab("charms")}>{charm ? cleanName(charm) : "+ SELECT CHARM"}</button>{charm && <button onClick={() => setCharm(null)} aria-label="Remove charm"><Icon name="close" size={12} /></button>}</div>}
-          <button className="save-craft" onClick={() => { flash("Тохиргоо автоматаар хадгалагдлаа"); setEditorItem(null); setEditorKey(null); }}>APPLY SETTINGS <Icon name="arrow" size={14} /></button>
+          <button className="save-craft" onClick={() => { flash("Тохиргоо автоматаар хадгалагдлаа"); setArmedSticker(null); setEditorItem(null); setEditorKey(null); }}>APPLY SETTINGS <Icon name="arrow" size={14} /></button>
         </section>
 
         {editorItem.kind === "Skins" && <aside className="pro-accessory-catalog">
           <nav><button className={accessoryTab === "stickers" ? "active" : ""} onClick={() => { setAccessoryTab("stickers"); setAccessoryLimit(48); setAccessoryQuery(""); }}>STICKERS <small>{remoteTotals.stickers ?? catalog.stickers.length}</small></button><button className={accessoryTab === "charms" ? "active" : ""} onClick={() => { setAccessoryTab("charms"); setAccessoryLimit(48); setAccessoryQuery(""); }}>CHARMS <small>{remoteTotals.charms ?? catalog.charms.length}</small></button></nav>
           <label className="pro-search accessory-search"><Icon name="search" size={14} /><input value={accessoryQuery} onChange={event => { setAccessoryQuery(event.target.value); setAccessoryLimit(48); }} placeholder="Нэр, rarity, event..." /></label>
           <div className="accessory-result-label"><span>RESULTS</span><strong>{accessoryItems.length}</strong></div>
-          <div className="pro-accessory-grid">{accessoryItems.slice(0, accessoryLimit).map(item => <button key={item.id} className="pro-accessory-item" style={rarityStyle(item)} draggable={accessoryTab === "stickers"} onDragStart={() => accessoryTab === "stickers" && setDraggedSticker(item)} onDragEnd={() => setDraggedSticker(null)} onClick={() => accessoryTab === "stickers" ? addSticker(item) : setCharm(item)}><CatalogThumb item={item} /><strong>{cleanName(item)}</strong><small>{item.effect || item.rarity}</small></button>)}</div>
+          <div className="pro-accessory-grid">{accessoryItems.slice(0, accessoryLimit).map(item => <button key={item.id} className={`pro-accessory-item ${armedSticker?.id === item.id ? "armed" : ""}`} style={rarityStyle(item)} draggable={accessoryTab === "stickers"} onDragStart={() => accessoryTab === "stickers" && setDraggedSticker(item)} onDragEnd={() => setDraggedSticker(null)} onClick={() => accessoryTab === "stickers" ? armStickerPlacement(item) : setCharm(item)}><CatalogThumb item={item} /><strong>{cleanName(item)}</strong><small>{item.effect || item.rarity}</small></button>)}</div>
           {accessoryItems.length > accessoryLimit && <button className="catalog-more" onClick={() => setAccessoryLimit(value => value + 96)}>MORE <span>{accessoryItems.length - accessoryLimit}</span></button>}
           {accessoryItems.length === 0 && <div className="accessory-empty">Catalog ачаалж байна...</div>}
         </aside>}
