@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Icon } from "@/components/icon";
 import type { HomeCard, HomeServerWidget, SiteConfig } from "@/lib/site-config";
 
-const iconOptions: HomeCard["icon"][] = ["rent", "discord", "crown", "skin", "server", "users", "trophy", "spark"];
+const iconOptions: HomeCard["icon"][] = ["discord", "crown", "skin", "server", "users", "trophy", "spark", "staff"];
 
 export function AdminSiteConfigManager({ initialConfig, writable }: { initialConfig: SiteConfig; writable: boolean }) {
   const [config, setConfig] = useState(initialConfig);

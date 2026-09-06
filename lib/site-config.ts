@@ -6,7 +6,7 @@ export type HomeCard = {
   title: string;
   text: string;
   href: string;
-  icon: "rent" | "discord" | "crown" | "skin" | "server" | "users" | "trophy" | "spark";
+  icon: "discord" | "crown" | "skin" | "server" | "users" | "trophy" | "spark" | "staff";
 };
 
 export type HomeServerWidget = {
@@ -98,7 +98,7 @@ function cleanConfig(input: unknown): SiteConfig {
   const cards = Array.isArray(source.cards) ? source.cards.slice(0, 4).map((card, index) => {
     const fallback = defaultSiteConfig.cards[index] ?? defaultSiteConfig.cards[0];
     const candidate = card && typeof card === "object" ? card as Partial<HomeCard> : {};
-    const allowedIcons: HomeCard["icon"][] = ["rent", "discord", "crown", "skin", "server", "users", "trophy", "spark"];
+    const allowedIcons: HomeCard["icon"][] = ["discord", "crown", "skin", "server", "users", "trophy", "spark", "staff"];
     const icon = allowedIcons.includes(candidate.icon as HomeCard["icon"]) ? candidate.icon as HomeCard["icon"] : fallback.icon;
     return {
       title: sanitizeString(candidate.title, fallback.title, 80),
