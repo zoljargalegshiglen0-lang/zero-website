@@ -1,0 +1,11 @@
+.git
+.github
+node_modules
+.next
+*.zip
+npm-debug.log*
+PUSH_TO_GITHUB.bat
+README_GITHUB_VERCEL.md
+VERCEL_DEPLOY.md
+UPDATE_NOTES.md
+COMMUNITY_INTEGRATION.md

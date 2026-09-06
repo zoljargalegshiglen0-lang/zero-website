@@ -1,0 +1,3 @@
+import { cookies } from "next/headers"; import { NextResponse } from "next/server"; import { getUserLoadout, saveUserLoadout } from "@/lib/community";
+export async function GET(){const s=await cookies();const id=s.get("zero_steam_id")?.value??"";if(!id)return NextResponse.json({error:"Unauthorized"},{status:401});return NextResponse.json({loadout:await getUserLoadout(id)});}
+export async function PUT(req:Request){const s=await cookies();const id=s.get("zero_steam_id")?.value??"";if(!id)return NextResponse.json({error:"Unauthorized"},{status:401});const b=await req.json().catch(()=>null);if(!b||typeof b.loadout!=="object")return NextResponse.json({error:"Invalid loadout"},{status:400});return NextResponse.json(await saveUserLoadout(id,b.loadout));}
