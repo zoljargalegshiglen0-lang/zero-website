@@ -35,3 +35,7 @@ For edits made inside the Admin Panel to persist on Vercel, connect Upstash Redi
 - `UPSTASH_REDIS_REST_TOKEN`
 
 Without Redis, change `data/site-config.json` in GitHub and push to deploy permanent defaults.
+
+## Vercel build fix
+- Fixed TypeScript literal type error in `lib/site-config.ts` for server widget `state`.
+- Verified production build successfully with Next.js 16.2.6 (`next build --webpack`).

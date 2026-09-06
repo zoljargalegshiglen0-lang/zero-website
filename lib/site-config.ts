@@ -121,7 +121,7 @@ function cleanConfig(input: unknown): SiteConfig {
       players: clamp(candidate.players, 0, 64, fallback.players),
       capacity: clamp(candidate.capacity, 1, 64, fallback.capacity),
       ping: clamp(candidate.ping, 0, 999, fallback.ping),
-      state: candidate.state === "OFFLINE" ? "OFFLINE" : "ONLINE",
+      state: (candidate.state === "OFFLINE" ? "OFFLINE" : "ONLINE") as HomeServerWidget["state"],
     };
   }) : defaultSiteConfig.servers;
 
