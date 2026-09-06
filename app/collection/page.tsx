@@ -1,58 +1,44 @@
-"use client";
-
-import { useMemo, useState } from "react";
+import Link from "next/link";
 import { Icon } from "@/components/icon";
 import { PageHeading } from "@/components/page-heading";
 
-const categories = ["Бүгд", "Models", "Masks", "Hats", "Wings", "Backpacks", "Effects", "Music Kits", "Badges", "Stickers", "Charms"];
-const roadmap = [
-  { title: "Character cosmetics", text: "Player models, mask, hats, wings, backpacks зэрэг custom cosmetic modules." },
-  { title: "Server utilities", text: "Top up, rental boosts, VIP utility болон role-linked perks." },
-  { title: "Collectibles", text: "Sticker, charm, medal, badge, seasonal drops болон limited items." },
+const categories = [
+  { title: "Server utilities", text: "VIP perks, rental boosts, access utilities." },
+  { title: "Cosmetics", text: "Future site-controlled cosmetic bundles or unlockables." },
+  { title: "Community items", text: "Badges, identity packs, role-linked unlocks." },
 ];
 
 export default function StorePage() {
-  const [filter, setFilter] = useState("Бүгд");
-  const [query, setQuery] = useState("");
-  const title = useMemo(() => filter === "Бүгд" ? "Бүх бараа" : filter, [filter]);
-
   return (
     <main className="page-wrap">
-      <PageHeading icon="spark" eyebrow="COMMUNITY STORE" title="STORE" description="Future store layout, category browser and roadmap showcase" />
+      <PageHeading icon="spark" eyebrow="STORE SYSTEM" title="STORE" description="Clean store shell without fake inventory counters or fake products" />
 
-      <section className="neo-store-shell">
-        <section className="neo-store-hero">
+      <section className="mono-section-block">
+        <div className="mono-section-head">
           <div>
-            <span>WINGS STORE / EARLY ACCESS</span>
-            <h2>Flexible shop system.</h2>
-            <p>Энэ page-ийг зүгээр хоосон state биш, category-driven storefront preview болгож шинэчиллээ.</p>
+            <span>Store modules</span>
+            <h2>Ready for real products</h2>
           </div>
-          <div className="neo-store-info"><strong>00</strong><small>Live items for now</small></div>
-        </section>
+          <Link href="/rent-server">Rent server</Link>
+        </div>
 
-        <nav className="collection-categories neo-store-categories" aria-label="Дэлгүүрийн ангилал">
-          {categories.map((category) => <button key={category} className={filter === category ? "active" : ""} onClick={() => setFilter(category)}>{category}<small>0</small></button>)}
-        </nav>
-
-        <section className="collection-control neo-store-control">
-          <div><span>00 ITEM</span><h2>{title}</h2></div>
-          <div><label className="collection-search"><Icon name="search" size={15} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Бараа хайх..." /></label></div>
-        </section>
-
-        <div className="neo-store-roadmap">
-          {roadmap.map((item) => (
-            <article key={item.title}>
+        <div className="mono-card-grid three">
+          {categories.map((item) => (
+            <article key={item.title} className="mono-info-card">
               <strong>{item.title}</strong>
               <p>{item.text}</p>
             </article>
           ))}
         </div>
 
-        <section className="store-empty-state neo-store-empty">
-          <i><Icon name="spark" size={27} /></i>
-          <h2>Бараа нэмэгдээгүй байна</h2>
-          <span>{query ? "Хайлтад тохирох бараа алга." : "Удахгүй live inventory болон shop items энд нэмэгдэнэ."}</span>
-        </section>
+        <div className="mono-empty-panel large">
+          <i><Icon name="spark" size={28} /></i>
+          <strong>No fake items displayed</strong>
+          <p>
+            Product feed хараахан нэмэгдээгүй байна. Жинхэнэ shop data орохоос өмнө demo бараануудыг зориуд харуулахгүйгээр
+            илүү clean, trustworthy байхаар үлдээлээ.
+          </p>
+        </div>
       </section>
     </main>
   );

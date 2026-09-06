@@ -1,75 +1,47 @@
-"use client";
-
-import { useMemo, useState } from "react";
+import Link from "next/link";
 import { Icon } from "@/components/icon";
 import { PageHeading } from "@/components/page-heading";
-import { clans } from "@/lib/data";
-
-const extraClans = [
-  ...clans,
-  { rank: 5, tag: "[SYNC]", name: "Synchronicity", members: 11, rating: 6920, wins: 29, tone: "blue" },
-  { rank: 6, tag: "[AURA]", name: "Aurora Project", members: 8, rating: 6610, wins: 24, tone: "pink" },
-];
 
 export default function ClansPage() {
-  const [query, setQuery] = useState("");
-  const [active, setActive] = useState(extraClans[0]);
-  const [mode, setMode] = useState("ALL");
-  const visible = useMemo(() => extraClans.filter((clan) => `${clan.tag} ${clan.name}`.toLowerCase().includes(query.toLowerCase()) && (mode !== "TOP 3" || clan.rank <= 3)), [query, mode]);
+  const features = [
+    { title: "Clan registry", text: "Team tag, roster, recruitment status, clan page холбоход бэлэн layout." },
+    { title: "Season support", text: "Clan wars, placement, seasonal standings хэсгүүдийг дараа нь live data-р дүүргэнэ." },
+    { title: "Clean fallback", text: "Хуурамч clan ranking list-ийг default-д гаргахгүй." },
+  ];
 
   return (
     <main className="page-wrap">
-      <PageHeading icon="clan" eyebrow="TEAM LADDER" title="CLANS" description="Clan browser, ranking and detail showcase" />
+      <PageHeading icon="clan" eyebrow="TEAM SYSTEM" title="CLANS" description="Clan directory and roster system-д зориулсан clean placeholder-free page" />
 
-      <section className="neo-clan-shell">
-        <article className="neo-clan-hero">
+      <section className="mono-section-block">
+        <div className="mono-section-head">
           <div>
-            <span>SEASON 01 / BUILD YOUR FIVE</span>
-            <h2>Form your roster. Push your tag.</h2>
-            <p>Leaderboard, clan directory, internal identity, seasonal wins болон community spotlight бүгдийг илүү цэгцтэй болгосон.</p>
+            <span>Clan hub</span>
+            <h2>Roster system pending live data</h2>
           </div>
-          <div className="neo-clan-hero-stats">
-            <article><strong>84</strong><small>clans tracked</small></article>
-            <article><strong>692</strong><small>members</small></article>
-            <article><strong>19</strong><small>active wars</small></article>
-          </div>
-        </article>
-
-        <div className="toolbar neo-toolbar">
-          <div className="filter-set">{["ALL", "TOP 3"].map((item) => <button className={mode === item ? "filter-chip active" : "filter-chip"} key={item} onClick={() => setMode(item)}>{item}</button>)}</div>
-          <label className="search-box"><Icon name="search" size={15} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Clan хайх..." /></label>
+          <Link href="/membership">Membership</Link>
         </div>
 
-        <div className="neo-clan-layout">
-          <div className="clan-roster neo-clan-roster">
-            {visible.map((clan) => (
-              <button key={clan.tag} className={`roster-clan roster-${clan.tone} ${active.tag === clan.tag ? "active" : ""}`} onClick={() => setActive(clan)}>
-                <span className="roster-rank">#{String(clan.rank).padStart(2, "0")}</span>
-                <i>{clan.tag.slice(1, 3)}</i>
-                <div><strong>{clan.name}</strong><small>{clan.tag} · {clan.members} MEMBERS</small></div>
-                <b>{clan.rating.toLocaleString()}</b>
-                <Icon name="arrow" size={15} />
-              </button>
-            ))}
-          </div>
+        <div className="mono-card-grid three">
+          {features.map((item) => (
+            <article key={item.title} className="mono-info-card">
+              <strong>{item.title}</strong>
+              <p>{item.text}</p>
+            </article>
+          ))}
+        </div>
 
-          <aside className={`clan-detail detail-${active.tone} neo-clan-detail`}>
-            <span>CLAN PROFILE / #{String(active.rank).padStart(2, "0")}</span>
-            <div className="clan-detail-mark">{active.tag.slice(1, 3)}</div>
-            <h2>{active.name}</h2>
-            <p>{active.tag} · ULAANBAATAR</p>
-            <div className="clan-detail-stats">
-              <div><strong>{active.rating.toLocaleString()}</strong><span>RATING</span></div>
-              <div><strong>{active.members}</strong><span>MEMBERS</span></div>
-              <div><strong>{active.wins}</strong><span>WINS</span></div>
-            </div>
-            <div className="clan-activity"><span>RECENT FORM</span><div>{["W", "W", "L", "W", "W"].map((result, index) => <i className={result === "W" ? "win" : "loss"} key={`${result}-${index}`}>{result}</i>)}</div></div>
-            <div className="neo-clan-detail-boxes">
-              <article><span>Preferred mode</span><strong>Premier</strong></article>
-              <article><span>Recruitment</span><strong>Open</strong></article>
-            </div>
-            <button>VIEW CLAN PROFILE <Icon name="arrow" size={15} /></button>
-          </aside>
+        <div className="mono-empty-panel large">
+          <i><Icon name="clan" size={28} /></i>
+          <strong>No fake clans shown</strong>
+          <p>
+            Clan creation / roster data source одоогоор холбогдоогүй байна.
+            Холбогдсоны дараа clan browser, clan detail, member list, invite flow энд шууд ажиллана.
+          </p>
+          <div className="mono-inline-links">
+            <Link className="page-button" href="/servers">Open servers</Link>
+            <Link className="ghost-button" href="/admin">Open admin</Link>
+          </div>
         </div>
       </section>
     </main>

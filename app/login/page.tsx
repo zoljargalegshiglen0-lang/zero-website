@@ -1,38 +1,32 @@
 import Link from "next/link";
+import { Icon } from "@/components/icon";
 
 export default function LoginPage() {
-  return <main className="cosmic-login-page">
-    <div className="cosmic-login-nebula cosmic-login-nebula-a" />
-    <div className="cosmic-login-nebula cosmic-login-nebula-b" />
-    <div className="cosmic-login-stars" />
-    <div className="cosmic-login-planet"><i /><b /></div>
-    <div className="cosmic-login-orbit orbit-one" />
-    <div className="cosmic-login-orbit orbit-two" />
+  return (
+    <main className="page-wrap mono-login-page">
+      <section className="mono-login-shell">
+        <article className="mono-login-copy">
+          <span>WINGS ACCOUNT</span>
+          <h1>Sign in with Steam</h1>
+          <p>
+            Steam OpenID-ээр нэвтрээд profile, loadout save, staff verification зэрэг site-ийн холбоотой хэсгүүдийг ашиглана.
+            Нууц үг WINGS дээр хадгалагдахгүй.
+          </p>
+          <div className="mono-card-grid three compact">
+            <article className="mono-info-card"><strong>OpenID</strong><p>Direct Steam authentication</p></article>
+            <article className="mono-info-card"><strong>Profile</strong><p>Avatar, SteamID64, account link</p></article>
+            <article className="mono-info-card"><strong>Loadout</strong><p>Saved skinchanger selections</p></article>
+          </div>
+        </article>
 
-    <section className="cosmic-login-shell">
-      <div className="cosmic-login-brand">
-        <span className="cosmic-login-mark">Ø</span>
-        <div><strong>WINGS</strong><small>COMMUNITY IDENTITY</small></div>
-      </div>
-
-      <div className="cosmic-login-copy">
-        <span className="cosmic-login-kicker"><i /> SECURE STEAM OPENID</span>
-        <h1>ENTER THE<br/><em>WINGS ARENA</em></h1>
-        <p>Steam account-аараа нэвтэрч WINGS profile-оо үүсгэнэ. SteamID64 баталгаажиж, public profile мэдээлэл боломжтой үед нэр болон avatar автоматаар холбогдоно.</p>
-        <div className="cosmic-login-features"><span><i /> VERIFIED STEAM ID</span><span><i /> LOADOUT PROFILE</span><span><i /> STAFF IDENTITY</span></div>
-      </div>
-
-      <div className="cosmic-login-action-card">
-        <div className="cosmic-login-card-head"><span>ACCOUNT GATEWAY</span><b>01</b></div>
-        <div className="cosmic-steam-orb"><span>STEAM</span><i /></div>
-        <h2>Sign in with Steam</h2>
-        <p>Нууц үг WINGS дээр хадгалагдахгүй. Authentication нь Steam OpenID-р хийгдэнэ.</p>
-        <a className="cosmic-steam-button" href="/api/auth/steam"><span className="cosmic-steam-icon">S</span><strong>CONTINUE WITH STEAM</strong><b>↗</b></a>
-        <div className="cosmic-login-security"><i /> STEAM OPENID · SECURE REDIRECT</div>
-        <Link className="cosmic-login-back" href="/skinchanger">← BACK TO LOADOUT</Link>
-      </div>
-    </section>
-
-    <footer className="cosmic-login-footer"><span>WINGS NETWORK · ULAANBAATAR</span><i /><span>IDENTITY NODE ONLINE</span></footer>
-  </main>;
+        <article className="mono-login-card">
+          <span>Secure gateway</span>
+          <strong>Steam authentication</strong>
+          <p>Continue хийснээр Steam рүү redirect хийгдэнэ.</p>
+          <a className="page-button mono-wide-button" href="/api/auth/steam"><Icon name="steam" size={18} /> Continue with Steam</a>
+          <Link className="ghost-button mono-wide-button" href="/skinchanger">Back to skinchanger</Link>
+        </article>
+      </section>
+    </main>
+  );
 }

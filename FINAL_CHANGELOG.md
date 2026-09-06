@@ -1,25 +1,15 @@
-# WINGS V4 Premium Redesign
+WINGS v7 redesign refresh
 
-## 1) Skinchanger deep redesign
-- Kept the existing loadout/craft/catalog base and functionality.
-- Added a new studio hero with active-item preview, side status, catalog totals, Steam state, and quick category access.
-- Refined cards, loadout surfaces, editor surfaces, and hover hierarchy without removing the existing craft flow.
+Main fixes from the last version
+- Reduced oversized headings and text scale.
+- Cleaned extra header / sidebar clutter.
+- Kept the base dark clean style, but restored color on skins and media.
+- Removed grayscale look from content visuals such as server / skinchanger media.
+- Refined shared page heading component.
+- Simplified homepage copy and layout.
+- Kept CS2 plugin / bridge readiness for the skinchanger system.
 
-## 2) Admin premium command center
-- Rebuilt the admin overview into an owner command center.
-- Added service health cards for production, storage, Steam API, and CS2 bridge.
-- Added cleaner quick-action cards and deployment/readiness panels.
-- Existing Website Controls and Steam Staff Manager remain functional below the new overview.
-
-## 3) Vercel final polish
-- Added `/api/health` for production checks.
-- Added custom loading and 404 pages.
-- Added `vercel.json` framework hint.
-- Added `typecheck` / `check` npm scripts.
-- Added a safer Windows Git push helper that warns when run directly from a ZIP temp folder and asks for Git identity if missing.
-- Added `VERCEL_FINAL_CHECKLIST.md`.
-
-## Validation performed
-- Parsed/transpiled all 47 TS/TSX source files with TypeScript: 0 syntax diagnostics.
-- Checked local `@/` imports: 0 missing local modules.
-- Checked CSS brace balance: balanced.
+Still included
+- Full multi-page redesign from v6
+- Admin panel, staff, moderation, login, profile, rent server, store, membership, clans, leaderboard
+- COMMUNITY_INTEGRATION.md and .env.example for bridge/plugin setup

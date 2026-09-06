@@ -39,20 +39,16 @@ export function SiteHeader() {
       if (config?.discordUrl) setDiscordUrl(config.discordUrl);
     });
 
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, []);
 
   return (
     <>
-      <div className="wings-utility-rail neo-utility-rail">
+      <div className="wings-utility-rail neo-utility-rail compact">
         <span><i /> WINGS NETWORK ONLINE</span>
-        <span>Premium CS2 community hub</span>
-        <span>Season 01 · Mongolia</span>
       </div>
 
-      <header className="wings-topbar neo-topbar">
+      <header className="wings-topbar neo-topbar cleaner">
         <div className="wings-topbar-left">
           <button className="nav-toggle" onClick={() => setOpen(!open)} aria-label="Цэс">
             <Icon name={open ? "close" : "menu"} />
@@ -60,10 +56,8 @@ export function SiteHeader() {
 
           <Link className="wings-brand neo-brand" href="/">
             <span className="wings-brand-mark"><img src="/wings-mark-mono.svg" alt="WINGS" /></span>
-            <span className="wings-brand-copy"><b>WINGS</b><small>COMMUNITY CONTROL HUB</small></span>
+            <span className="wings-brand-copy"><b>WINGS</b><small>CS2 COMMUNITY HUB</small></span>
           </Link>
-
-          <div className="wings-live-pill neo-live-pill"><i /> Live</div>
         </div>
 
         <div className="wings-topbar-right">
@@ -111,26 +105,22 @@ export function SiteHeader() {
                   <Link key={item.href} className={path === item.href ? "active" : ""} href={item.href} onClick={() => setOpen(false)}>
                     <i><Icon name={item.icon} size={16} /></i>
                     <span>{item.label}</span>
-                    {item.href === "/skinchanger" || item.href === "/clans" ? <b className="wings-nav-badge">new</b> : null}
+                    {item.href === "/skinchanger" ? <b className="wings-nav-badge">new</b> : null}
                   </Link>
                 ))}
             </nav>
           </section>
         ))}
 
-        <div className="neo-sidebar-foot">
+        <div className="neo-sidebar-foot simple">
           <a className="wings-sidebar-discord" href={discordUrl} target="_blank" rel="noreferrer">
-            <i className="wings-sidebar-discord-icon"><Icon name="discord" size={24} /></i>
+            <i className="wings-sidebar-discord-icon"><Icon name="discord" size={20} /></i>
             <div>
               <span>COMMUNITY</span>
               <strong>Join Discord</strong>
             </div>
             <Icon name="arrow" size={16} />
           </a>
-          <div className="neo-sidebar-mini-stats">
-            <article><strong>24/7</strong><span>support</span></article>
-            <article><strong>CS2</strong><span>hub</span></article>
-          </div>
         </div>
       </aside>
     </>

@@ -579,52 +579,48 @@ export default function SkinChangerPage() {
 
   return <main className={`page-wrap changer-page pro-changer-page ${steamAuthed === false ? "skinchanger-locked" : ""}`}>
     {steamAuthed === false && <div className="steam-skin-gate"><div className="steam-skin-gate-card"><span><Icon name="steam" size={28} /></span><small>WINGS LOADOUT ACCESS</small><strong>STEAM LOGIN REQUIRED</strong><p>Skin Changer болон SteamID64-д хадгалагдах loadout ашиглахын тулд Steam-ээр нэвтэрнэ үү.</p><a href="/login">SIGN IN WITH STEAM <Icon name="arrow" size={15} /></a></div></div>}
-    <PageHeading icon="skin" eyebrow="LIVE COSMETIC STUDIO" title="SKIN CHANGER" description="Steam-д холбогдсон personal loadout · craft studio · team loadout" />
+    <PageHeading icon="skin" eyebrow="LOADOUT STUDIO" title="SKINCHANGER" description="Steam-saved loadout · live catalog · plugin bridge ready" />
 
-    <section className="skin-v4-hero">
-      <article className="skin-v4-hero-main">
-        <div className="skin-v4-copy">
-          <span>WINGS LOADOUT LAB / {side}</span>
-          <h2>Build it. Preview it. Equip it.</h2>
-          <p>Үндсэн loadout flow-г хэвээр үлдээгээд, илүү premium studio hierarchy, quick status, selected-item preview болон craft focus нэмлээ.</p>
-          <div className="skin-v4-actions">
-            <button onClick={() => { setCategory("Skins"); setGroup("ALL"); setBoardView("loadout"); setBoardQuery(""); }}>OPEN LOADOUT</button>
-            <button className="ghost" onClick={() => openSpecialCategory("Knives", side)}>KNIVES</button>
-            <button className="ghost" onClick={() => openSpecialCategory("Agents", side)}>AGENTS</button>
+    <section className="skin-v8-shell">
+      <div className="skin-v8-topbar">
+        <div className="skin-v8-brandline">
+          <span>WINGS LOADOUT</span>
+          <strong>{side} SIDE</strong>
+          <small>{catalogState === "live" ? "LIVE CATALOG" : catalogState === "loading" ? "SYNCING" : "LOCAL CATALOG"}</small>
+        </div>
+        <div className="skin-v8-top-actions">
+          <button className={side === "CT" ? "active" : ""} onClick={() => switchSide("CT")}>CT</button>
+          <button className={side === "T" ? "active" : ""} onClick={() => switchSide("T")}>T</button>
+          <button onClick={() => { setCategory("Skins"); setGroup("ALL"); setBoardView("loadout"); setBoardQuery(""); }}>LOADOUT</button>
+          <button onClick={() => openSpecialCategory("Knives", side)}>KNIVES</button>
+          <button onClick={() => openSpecialCategory("Agents", side)}>AGENTS</button>
+        </div>
+      </div>
+
+      <div className="skin-v8-focus-row">
+        <article className="skin-v8-active-card" style={activeLoadoutItem ? rarityStyle(activeLoadoutItem) : undefined}>
+          <div className="skin-v8-active-art">
+            {activeLoadoutItem ? <CatalogThumb item={activeLoadoutItem} className="skin-v8-active-thumb" /> : <span><Icon name="skin" size={30} /></span>}
           </div>
-        </div>
-        <div className="skin-v4-focus" style={activeLoadoutItem ? rarityStyle(activeLoadoutItem) : undefined}>
-          <div className="skin-v4-focus-top"><span>ACTIVE PREVIEW</span><b>{activeLoadoutItem?.rarity ?? "DEFAULT"}</b></div>
-          <div className="skin-v4-focus-art">
-            {activeLoadoutItem ? <CatalogThumb item={activeLoadoutItem} className="skin-v4-focus-thumb" /> : <span className="skin-v4-empty-mark"><Icon name="skin" size={34} /></span>}
+          <div className="skin-v8-active-copy">
+            <span>ACTIVE ITEM</span>
+            <strong>{activeLoadoutItem ? cleanName(activeLoadoutItem) : `${side} LOADOUT`}</strong>
+            <small>{activeLoadoutItem?.weapon || `${equippedCount} equipped items`}</small>
           </div>
-          <strong>{activeLoadoutItem ? cleanName(activeLoadoutItem) : `${side} LOADOUT`}</strong>
-          <small>{activeLoadoutItem?.weapon || `${equippedCount} equipped items`}</small>
-        </div>
-      </article>
+        </article>
 
-      <aside className="skin-v4-hero-side">
-        <div className="skin-v4-metric-grid">
-          <article><span>Equipped</span><strong>{equippedCount}</strong><small>{side} side</small></article>
-          <article><span>Catalog</span><strong>{catalogTotal.toLocaleString()}</strong><small>{catalogState}</small></article>
-          <article><span>Weapon slots</span><strong>{teamSlotCount}</strong><small>available</small></article>
-          <article><span>Steam</span><strong>{steamAuthed ? "LINKED" : "LOGIN"}</strong><small>{steamId64 ? steamId64.slice(-6) : "identity"}</small></article>
+        <div className="skin-v8-metrics">
+          <article><span>EQUIPPED</span><strong>{equippedCount}</strong></article>
+          <article><span>CATALOG</span><strong>{catalogTotal.toLocaleString()}</strong></article>
+          <article><span>WEAPON SLOTS</span><strong>{teamSlotCount}</strong></article>
+          <article><span>STEAM</span><strong>{steamAuthed ? "LINKED" : "LOGIN"}</strong></article>
         </div>
-        <div className="skin-v4-side-switch">
-          <button className={side === "CT" ? "active ct" : "ct"} onClick={() => switchSide("CT")}><span>CT</span><strong>{sideCount("CT")}</strong></button>
-          <button className={side === "T" ? "active t" : "t"} onClick={() => switchSide("T")}><span>T</span><strong>{sideCount("T")}</strong></button>
-        </div>
-      </aside>
-    </section>
+      </div>
 
-    <section className="catalog-status-strip skin-v4-status-strip">
-      <div><i className={catalogState} /><span>{catalogState === "live" ? "LIVE CS2 CATALOG" : catalogState === "loading" ? "CATALOG SYNCING" : "LOCAL CATALOG"}</span></div>
-      <div><span>SIDE</span><strong>{side}</strong><b /> <span>LOADOUT</span><strong>{equippedCount}</strong><b /> <span>SKINS</span><strong>{remoteTotals.skins ?? catalog.skins.length}</strong><b /> <span>STICKERS</span><strong>{remoteTotals.stickers ?? catalog.stickers.length}</strong></div>
-    </section>
-
-    <section className="loadout-team-toggle" aria-label="Loadout side">
-      <button className={side === "CT" ? "active ct" : "ct"} onClick={() => switchSide("CT")}><span>CT</span><strong>COUNTER-TERRORIST</strong><small>{sideCount("CT")} EQUIPPED</small></button>
-      <button className={side === "T" ? "active t" : "t"} onClick={() => switchSide("T")}><span>T</span><strong>TERRORIST</strong><small>{sideCount("T")} EQUIPPED</small></button>
+      <div className="skin-v8-catalog-line">
+        <div><i className={catalogState} /><span>{remoteTotals.skins ?? catalog.skins.length} skins</span><b /> <span>{remoteTotals.stickers ?? catalog.stickers.length} stickers</span><b /> <span>{catalog.charms.length} charms</span></div>
+        <small>Saved loadouts sync through /api/loadout and optional CS2 bridge.</small>
+      </div>
     </section>
 
     <section className="pro-loadout-shell">
@@ -693,7 +689,7 @@ export default function SkinChangerPage() {
             onPointerDown={beginPreviewRotate} onPointerMove={movePreviewRotate} onPointerUp={() => setDraggingPreview(false)} onPointerCancel={() => setDraggingPreview(false)}
             onDragOver={event => event.preventDefault()} onDrop={event => { event.preventDefault(); if (draggedSticker) placeStickerAt(draggedSticker, event.clientX, event.clientY, event.currentTarget); setDraggedSticker(null); }}>
             <span className="preview-grid" />
-            <div className="preview-identity"><small>FAKE 3D PREVIEW · DRAG TO ROTATE</small><strong>{editorItem.weapon || editorItem.kind} | {cleanName(editorItem)}</strong><em>{editorItem.rarity}</em></div>
+            <div className="preview-identity"><small>3D PREVIEW · DRAG TO ROTATE</small><strong>{editorItem.weapon || editorItem.kind} | {cleanName(editorItem)}</strong><em>{editorItem.rarity}</em></div>
             <div className="fake-3d-object" style={{ transform: `perspective(1100px) rotateX(${previewRotation.x}deg) rotateY(${previewRotation.y}deg)` }}>
               <span className="fake-3d-depth" />
               {editorItem.image ? <CatalogThumb item={editorItem} className="preview-weapon-image fake-model-image" /> : <span className="preview-core">{initials(editorItem.weapon || editorItem.name)}</span>}

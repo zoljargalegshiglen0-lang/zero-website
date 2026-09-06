@@ -1,95 +1,47 @@
-"use client";
-
-import { useMemo, useState } from "react";
+import Link from "next/link";
 import { Icon } from "@/components/icon";
 import { PageHeading } from "@/components/page-heading";
-import { leaders } from "@/lib/data";
-
-function level(rating: number) {
-  if (rating >= 2000) return 10;
-  if (rating >= 1750) return 9;
-  if (rating >= 1530) return 8;
-  if (rating >= 1350) return 7;
-  if (rating >= 1200) return 6;
-  if (rating >= 1050) return 5;
-  if (rating >= 900) return 4;
-  if (rating >= 750) return 3;
-  if (rating >= 600) return 2;
-  return 1;
-}
 
 export default function LeaderboardPage() {
-  const [query, setQuery] = useState("");
-  const [rankFilter, setRankFilter] = useState("ALL");
-  const [active, setActive] = useState(leaders[0]);
-  const visible = useMemo(
-    () => leaders.filter((player) => player.name.toLowerCase().includes(query.toLowerCase()) && (rankFilter === "ALL" || level(player.rating) === Number(rankFilter))),
-    [query, rankFilter],
-  );
+  const blocks = [
+    { title: "No fake ladder", text: "Хуурамч player rank list-г default-аар нуусан." },
+    { title: "Ready for real stats", text: "Plugin эсвэл bridge-ээс ELO / wins / K-D өгөгдөл ороход энэ page автоматаар бодит board болж өргөтгөнө." },
+    { title: "Production direction", text: "Empty state нь шууд ойлгомжтой, fake top-10 харуулахгүй." },
+  ];
 
   return (
     <main className="page-wrap">
-      <PageHeading icon="trophy" eyebrow="COMPETITIVE RANKING" title="LEADERBOARD" description="Top players, detailed stat view, season ladder" />
+      <PageHeading icon="trophy" eyebrow="COMPETITIVE LADDER" title="LEADERBOARD" description="Real ranking feed холбогдохоор ашиглах ready layout" />
 
-      <section className="neo-ranking-shell">
-        <div className="neo-ranking-topcards">
-          {leaders.slice(0, 3).map((player) => (
-            <article className={`neo-toprank-card rank-${player.rank}`} key={player.rank} onClick={() => setActive(player)}>
-              <span>TOP {player.rank}</span>
-              <strong>{player.name}</strong>
-              <small>{player.tag}</small>
-              <b>{player.rating.toLocaleString()} ELO</b>
-              <p>{player.winRate}% WR · {player.kd.toFixed(2)} K/D</p>
+      <section className="mono-section-block">
+        <div className="mono-section-head">
+          <div>
+            <span>Ranking status</span>
+            <h2>Awaiting live competitive data</h2>
+          </div>
+          <Link href="/admin">Admin</Link>
+        </div>
+
+        <div className="mono-card-grid three">
+          {blocks.map((item) => (
+            <article key={item.title} className="mono-info-card">
+              <strong>{item.title}</strong>
+              <p>{item.text}</p>
             </article>
           ))}
         </div>
 
-        <div className="level-scale neo-level-scale">
-          <span>FILTER BY LEVEL</span>
-          {Array.from({ length: 10 }, (_, index) => index + 1).map((value) => (
-            <button key={value} onClick={() => setRankFilter(rankFilter === String(value) ? "ALL" : String(value))} className={`level-chip level-${value} ${rankFilter === String(value) ? "selected" : ""}`}>
-              {value}
-            </button>
-          ))}
-          <button className={rankFilter === "ALL" ? "level-reset active" : "level-reset"} onClick={() => setRankFilter("ALL")}>ALL</button>
-        </div>
-
-        <div className="ranking-layout neo-ranking-layout">
-          <section className="neo-surface ranking-table-surface">
-            <div className="toolbar neo-toolbar">
-              <span className="season-label">SEASON 01 · WINGS GLOBAL</span>
-              <label className="search-box"><Icon name="search" size={15} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Тоглогч хайх..." /></label>
-            </div>
-            <div className="data-panel neo-table-panel">
-              <div className="data-row data-header detailed-rank-row"><span>#</span><span>PLAYER</span><span>LEVEL</span><span>ELO</span><span>WIN</span><span>K/D</span></div>
-              {visible.map((player) => (
-                <button key={player.rank} className={`data-row detailed-rank-row player-row ${active.rank === player.rank ? "selected" : ""}`} onClick={() => setActive(player)}>
-                  <span>#{String(player.rank).padStart(2, "0")}</span>
-                  <div className="table-player"><i>{player.name[0]}</i><span><strong>{player.name}</strong><small>{player.tag}</small></span></div>
-                  <b className={`level-badge level-${level(player.rating)}`}>{level(player.rating)}</b>
-                  <strong>{player.rating.toLocaleString()}</strong>
-                  <span>{player.winRate}%</span>
-                  <span>{player.kd.toFixed(2)}</span>
-                </button>
-              ))}
-              {!visible.length && <div className="empty-box">Тоглогч олдсонгүй.</div>}
-            </div>
-          </section>
-
-          <aside className="player-detail neo-surface neo-player-detail">
-            <span>PLAYER INSIGHT</span>
-            <div className="detail-avatar">{active.name[0]}</div>
-            <h2>{active.name}</h2>
-            <p>{active.tag} · RANK #{active.rank}</p>
-            <div className="detail-level"><span className={`level-badge level-${level(active.rating)}`}>{level(active.rating)}</span><div><strong>LEVEL {level(active.rating)}</strong><span>{active.rating.toLocaleString()} ELO</span></div></div>
-            <div className="player-metrics">
-              <div><span>WIN RATE</span><strong>{active.winRate}%</strong></div>
-              <div><span>MATCH WINS</span><strong>{active.wins}</strong></div>
-              <div><span>K/D RATIO</span><strong>{active.kd.toFixed(2)}</strong></div>
-              <div><span>FORM</span><strong>+{Math.round(active.rating / 29)}</strong></div>
-            </div>
-            <div className="recent-results"><span>RECENT</span>{["W", "W", "L", "W", "W"].map((item, index) => <i key={`${item}-${index}`} className={item === "W" ? "win" : "loss"}>{item}</i>)}</div>
-          </aside>
+        <div className="mono-empty-panel large">
+          <i><Icon name="trophy" size={28} /></i>
+          <strong>Live leaderboard data not connected</strong>
+          <p>
+            Match result / rating data source холбоогүй байгаа тул энд fake leaderboard үзүүлэхгүй.
+            Integration хийсний дараа player table, filters, rank progression, season ladder-ийг бодитоор ажиллуулахад бэлэн.
+          </p>
+          <div className="mono-inline-links">
+            <Link className="page-button" href="/profile">Open profile</Link>
+            <Link className="ghost-button" href="/skinchanger">Open skinchanger</Link>
+          </div>
         </div>
       </section>
     </main>
