@@ -41,16 +41,16 @@ export const defaultSiteConfig: SiteConfig = {
   announcement: {
     enabled: true,
     badge: "WINGS UPDATE",
-    title: "WINGS community шинэчлэгдлээ",
-    body: "Шинэ dashboard, admin control, live server widgets болон community tools нэг дор.",
+    title: "WINGS шинэ season эхэллээ",
+    body: "Servers, skinchanger, clans болон community tools бүгд нэг дор.",
     buttonText: "JOIN DISCORD",
     buttonHref: "https://discord.gg/tFNYKQpHZe",
   },
   cards: [
-    { title: "CS2 Server Rental", text: "Private session, custom map, hourly demo pricing.", href: "/rent-server", icon: "rent" },
-    { title: "Join Discord Community", text: "Staff team, events and community support in one place.", href: "https://discord.gg/tFNYKQpHZe", icon: "discord" },
-    { title: "Shop Page", text: "Membership, cosmetics and future add-ons showcase.", href: "/collection", icon: "crown" },
-    { title: "Skinchanger", text: "Build your loadout with skins, charms, stickers and more.", href: "/skinchanger", icon: "skin" },
+    { title: "Server Rental", text: "Private server, custom map, hourly rental.", href: "/rent-server", icon: "rent" },
+    { title: "Discord Community", text: "News, support, events and community chat.", href: "https://discord.gg/tFNYKQpHZe", icon: "discord" },
+    { title: "Store", text: "Membership, cosmetics and community items.", href: "/collection", icon: "crown" },
+    { title: "Skinchanger", text: "Skins, stickers, charms and complete loadouts.", href: "/skinchanger", icon: "skin" },
   ],
   servers: [
     { id: "01", name: "WINGS PREMIER #1", mode: "PREMIER", map: "ANCIENT", players: 8, capacity: 10, ping: 12, state: "ONLINE" },

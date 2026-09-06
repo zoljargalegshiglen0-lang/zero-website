@@ -1,13 +1,12 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Icon } from "@/components/icon";
-import { communityBridgeConfigured, getLiveServers, getModerationRecords } from "@/lib/community";
+import { getLiveServers } from "@/lib/community";
 import { getSiteConfig } from "@/lib/site-config";
-import { getStaffMembers } from "@/lib/staff-store";
 
 export const dynamic = "force-dynamic";
 
-function ExternalOrInternalLink({ href, className, children }: { href: string; className?: string; children: ReactNode }) {
+function SmartLink({ href, className, children }: { href: string; className?: string; children: ReactNode }) {
   const external = /^https?:\/\//i.test(href);
   return external
     ? <a href={href} className={className} target="_blank" rel="noreferrer">{children}</a>
@@ -15,158 +14,123 @@ function ExternalOrInternalLink({ href, className, children }: { href: string; c
 }
 
 export default async function Home() {
-  const [liveServers, moderation, config, staff] = await Promise.all([
-    getLiveServers(),
-    getModerationRecords(),
-    getSiteConfig(),
-    getStaffMembers(),
-  ]);
-
-  const bridgeReady = communityBridgeConfigured();
-  const serverPool = (liveServers.length ? liveServers : config.servers).slice(0, 6);
-  const onlinePlayers = serverPool.reduce((sum, server) => sum + Number(server.players || 0), 0);
-  const capacity = serverPool.reduce((sum, server) => sum + Number(server.capacity || 0), 0);
+  const [liveServers, config] = await Promise.all([getLiveServers(), getSiteConfig()]);
+  const servers = (liveServers.length ? liveServers : config.servers).slice(0, 6);
+  const onlinePlayers = servers.reduce((sum, server) => sum + Number(server.players || 0), 0);
+  const capacity = servers.reduce((sum, server) => sum + Number(server.capacity || 0), 0);
   const occupancy = capacity ? Math.round((onlinePlayers / capacity) * 100) : 0;
-  const onlineServers = serverPool.filter((server) => server.state === "ONLINE").length;
-  const shortcutCards = config.cards.slice(0, 4);
 
-  const highlights = [
-    { label: "Live servers", value: String(serverPool.length), note: bridgeReady ? "bridge data" : "fallback widgets", icon: "server" as const },
-    { label: "Online players", value: String(onlinePlayers), note: capacity ? `${occupancy}% occupancy` : "awaiting traffic", icon: "users" as const },
-    { label: "Staff profiles", value: String(staff.length), note: staff.length ? "public team page ready" : "add from admin panel", icon: "staff" as const },
-    { label: "Moderation records", value: String(moderation.length), note: moderation.length ? "live stored actions" : "no fake logs shown", icon: "shield" as const },
+  const stats = [
+    { label: "Servers", value: String(servers.length || 0).padStart(2, "0"), icon: "server" as const },
+    { label: "Online", value: String(onlinePlayers), icon: "users" as const },
+    { label: "Occupancy", value: capacity ? `${occupancy}%` : "—", icon: "chart" as const },
+    { label: "Season", value: "S01", icon: "trophy" as const },
   ];
 
-  const readiness = [
-    { title: "Steam sign-in", status: "READY", note: "OpenID login page is active." },
-    { title: "CS2 bridge", status: bridgeReady ? "CONNECTED" : "PENDING", note: bridgeReady ? "Live server / loadout sync endpoint configured." : "Set CS2_BRIDGE_URL to connect plugin data." },
-    { title: "Admin editing", status: "READY", note: "Homepage links, Discord URL, widgets and staff can be managed." },
-    { title: "Fake demo content", status: "REMOVED", note: "Homepage avoids placeholder players / fake ladders." },
+  const shortcuts = [
+    { title: "Play", text: "Open live server browser", href: "/servers", icon: "server" as const, tone: "blue" },
+    { title: "Skinchanger", text: "Build and save your loadout", href: "/skinchanger", icon: "skin" as const, tone: "violet" },
+    { title: "Clans", text: "Teams, roster and rankings", href: "/clans", icon: "clan" as const, tone: "amber" },
+    { title: "Discord", text: "Community, support and news", href: config.discordUrl, icon: "discord" as const, tone: "discord" },
   ];
 
   return (
-    <main className="page-wrap mono-home-page">
-      {config.announcement.enabled && (
-        <section className="mono-banner">
-          <div>
-            <span>{config.announcement.badge}</span>
-            <strong>{config.announcement.title}</strong>
-            <p>{config.announcement.body}</p>
-          </div>
-          <ExternalOrInternalLink href={config.announcement.buttonHref} className="mono-inline-action">
-            <Icon name="discord" size={17} /> {config.announcement.buttonText || "Join Discord"}
-          </ExternalOrInternalLink>
-        </section>
-      )}
+    <main className="page-wrap home-v9">
+      <section className="home-v9-hero">
+        <div className="home-v9-copy">
+          {config.announcement.enabled ? (
+            <SmartLink href={config.announcement.buttonHref} className="home-v9-notice">
+              <span>{config.announcement.badge}</span>
+              <strong>{config.announcement.title}</strong>
+              <Icon name="arrow" size={13} />
+            </SmartLink>
+          ) : null}
 
-      <section className="mono-hero-grid">
-        <article className="mono-hero-block mono-hero-main">
-          <span className="mono-kicker">WINGS / COMMUNITY PLATFORM</span>
-          <h1>Build your hub.<br />Sharper, cleaner, better.</h1>
-          <p>
-            Homepage, server browser, community tools болон control хэсгүүдийг илүү цэвэр, modern хэлбэрт оруулж шинэчилсэн. Суурь нь dark / clean, харин skinchanger болон контентын өнгө хэвээр хадгалагдана.
-          </p>
-          <div className="mono-action-row">
-            <Link href="/servers" className="page-button">Open servers <Icon name="arrow" size={14} /></Link>
-            <a href={config.discordUrl} target="_blank" rel="noreferrer" className="ghost-button">
-              <Icon name="discord" size={17} /> Join Discord
-            </a>
-            <Link href="/skinchanger" className="ghost-button">Skinchanger</Link>
+          <span className="home-v9-kicker">WINGS / CS2 COMMUNITY</span>
+          <h1>Play. Build.<br /><em>Own your loadout.</em></h1>
+          <p>Competitive servers, custom loadouts, clans, staff болон community tools — нэг clean hub дотор.</p>
+
+          <div className="home-v9-actions">
+            <Link href="/servers" className="home-v9-primary">Play now <Icon name="arrow" size={14} /></Link>
+            <Link href="/skinchanger" className="home-v9-secondary"><Icon name="skin" size={16} /> Skinchanger</Link>
+            <a href={config.discordUrl} target="_blank" rel="noreferrer" className="home-v9-secondary discord"><Icon name="discord" size={17} /> Discord</a>
           </div>
-          <div className="mono-stat-grid">
-            {highlights.map((item) => (
-              <article key={item.label}>
-                <i><Icon name={item.icon} size={18} /></i>
-                <span>{item.label}</span>
-                <strong>{item.value}</strong>
-                <small>{item.note}</small>
+
+          <div className="home-v9-stats">
+            {stats.map((stat) => (
+              <article key={stat.label}>
+                <i><Icon name={stat.icon} size={17} /></i>
+                <div><span>{stat.label}</span><strong>{stat.value}</strong></div>
               </article>
             ))}
           </div>
-        </article>
+        </div>
 
-        <article className="mono-hero-block mono-hero-side">
-          <div className="mono-panel-head">
+        <aside className="home-v9-live">
+          <div className="home-v9-live-head">
             <div>
-              <span>Network overview</span>
-              <h2>Current state</h2>
+              <span>LIVE SERVERS</span>
+              <h2>Find a match</h2>
             </div>
-            <b>{bridgeReady ? "LIVE" : "SETUP"}</b>
+            <Link href="/servers">View all</Link>
           </div>
-          <div className="mono-overview-stack">
-            <div><span>Online servers</span><strong>{onlineServers}</strong></div>
-            <div><span>Total slots</span><strong>{capacity || "—"}</strong></div>
-            <div><span>Occupancy</span><strong>{capacity ? `${occupancy}%` : "—"}</strong></div>
-          </div>
-          <div className="mono-mini-list">
-            {serverPool.length ? serverPool.slice(0, 4).map((server, index) => (
+
+          <div className="home-v9-server-list">
+            {servers.length ? servers.slice(0, 4).map((server, index) => (
               <article key={`${server.id}-${index}`}>
-                <div>
+                <div className="home-v9-server-index">{String(index + 1).padStart(2, "0")}</div>
+                <div className="home-v9-server-copy">
                   <strong>{server.name}</strong>
                   <small>{server.mode} · {server.map}</small>
                 </div>
-                <b>{server.players}/{server.capacity}</b>
+                <div className="home-v9-server-count"><b>{server.players}</b><span>/{server.capacity}</span></div>
+                <i className={server.state === "ONLINE" ? "online" : "offline"} />
               </article>
             )) : (
-              <div className="mono-empty-compact">No server widgets configured yet.</div>
+              <div className="home-v9-empty">No servers connected yet.</div>
             )}
           </div>
-        </article>
+
+          <div className="home-v9-live-foot">
+            <span><i /> Network status</span>
+            <b>{servers.length ? "ONLINE" : "WAITING"}</b>
+          </div>
+        </aside>
       </section>
 
-      <section className="mono-section-block">
-        <div className="mono-section-head">
+      <section className="home-v9-shortcuts">
+        {shortcuts.map((item) => (
+          <SmartLink key={item.title} href={item.href} className={`home-v9-shortcut tone-${item.tone}`}>
+            <i><Icon name={item.icon} size={20} /></i>
+            <div><strong>{item.title}</strong><span>{item.text}</span></div>
+            <Icon name="arrow" size={14} />
+          </SmartLink>
+        ))}
+      </section>
+
+      <section className="home-v9-bottom-grid">
+        <article className="home-v9-panel home-v9-featured">
           <div>
-            <span>Shortcut panels</span>
-            <h2>Core navigation</h2>
+            <span>LOADOUT STUDIO</span>
+            <h2>Build your CS2 setup</h2>
+            <p>Weapons, knives, gloves, stickers, charms, agents, music kits болон medals нэг дор.</p>
+            <Link href="/skinchanger" className="home-v9-text-link">Open studio <Icon name="arrow" size={14} /></Link>
           </div>
-          <Link href="/admin">Admin panel</Link>
-        </div>
-        <div className="mono-card-grid four">
-          {shortcutCards.map((card) => (
-            <ExternalOrInternalLink key={card.title} href={card.href} className="mono-nav-card">
-              <i><Icon name={card.icon} size={20} /></i>
-              <strong>{card.title}</strong>
-              <p>{card.text}</p>
-              <span>Open <Icon name="arrow" size={14} /></span>
-            </ExternalOrInternalLink>
-          ))}
-        </div>
-      </section>
-
-      <section className="mono-two-column">
-        <article className="mono-section-block">
-          <div className="mono-section-head">
-            <div>
-              <span>Readiness</span>
-              <h2>Platform status</h2>
-            </div>
-          </div>
-          <div className="mono-check-grid">
-            {readiness.map((item) => (
-              <article key={item.title}>
-                <div>
-                  <strong>{item.title}</strong>
-                  <small>{item.note}</small>
-                </div>
-                <b>{item.status}</b>
-              </article>
-            ))}
-          </div>
+          <div className="home-v9-feature-mark"><Icon name="skin" size={34} /></div>
         </article>
 
-        <article className="mono-section-block">
-          <div className="mono-section-head">
-            <div>
-              <span>Next integration</span>
-              <h2>CS2 skinchanger bridge</h2>
-            </div>
-            <Link href="/skinchanger">Open</Link>
+        <article className="home-v9-panel home-v9-community">
+          <div className="home-v9-live-head">
+            <div><span>COMMUNITY</span><h2>Stay connected</h2></div>
           </div>
-          <div className="mono-note-stack">
-            <article><strong>Loadout save API</strong><p>`/api/loadout` already stores the current loadout and can sync to the bridge.</p></article>
-            <article><strong>Catalog feeds</strong><p>Skins, stickers, charms, agents, music kits, medals all fetch from live CS2 catalog sources.</p></article>
-            <article><strong>Plugin connection</strong><p>Set bridge env values and connect your CS2 plugin / relay service using COMMUNITY_INTEGRATION.md.</p></article>
+          <div className="home-v9-community-links">
+            {config.cards.slice(0, 3).map((card) => (
+              <SmartLink href={card.href} key={card.title} className="home-v9-community-row">
+                <i><Icon name={card.icon} size={16} /></i>
+                <div><strong>{card.title}</strong><small>{card.text}</small></div>
+                <Icon name="arrow" size={13} />
+              </SmartLink>
+            ))}
           </div>
         </article>
       </section>
