@@ -27,7 +27,7 @@ export default async function RootLayout({
         <SiteHeader />
         {children}
         <footer className="site-footer wings-site-footer">
-          <Link className="logo wings-footer-brand" href="/"><span className="logo-mark"><img src="/wings-mark.svg" alt="WINGS" /></span><span>WINGS<small>CS2 COMMUNITY</small></span></Link>
+          <Link className="logo wings-footer-brand" href="/"><span className="logo-mark"><img src="/wings-mark-mono.svg" alt="WINGS" /></span><span>WINGS<small>CS2 COMMUNITY</small></span></Link>
           <nav>
             <Link href="/servers">SERVERS</Link>
             <Link href="/clans">CLANS</Link>

@@ -59,7 +59,7 @@ export function SiteHeader() {
           </button>
 
           <Link className="wings-brand neo-brand" href="/">
-            <span className="wings-brand-mark"><img src="/wings-mark.svg" alt="WINGS" /></span>
+            <span className="wings-brand-mark"><img src="/wings-mark-mono.svg" alt="WINGS" /></span>
             <span className="wings-brand-copy"><b>WINGS</b><small>COMMUNITY CONTROL HUB</small></span>
           </Link>
 

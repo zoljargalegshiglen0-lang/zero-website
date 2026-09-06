@@ -401,6 +401,9 @@ export default function SkinChangerPage() {
   const visibleTeamLoadout = teamLoadouts[side];
   const teamSlotCount = visibleTeamLoadout.reduce((total, section) => total + section.slots.length, 0);
   const showTeamLoadout = category === "Skins" && boardView === "loadout" && group === "ALL" && !boardQuery;
+  const sideEquippedEntries = Object.entries(equipped).filter(([key]) => key.startsWith(`${side}:`));
+  const activeLoadoutItem = selectedEquipped ?? sideEquippedEntries[0]?.[1] ?? null;
+  const catalogTotal = (remoteTotals.skins ?? catalog.skins.length) + (remoteTotals.stickers ?? catalog.stickers.length) + (remoteTotals.charms ?? catalog.charms.length) + (remoteTotals.agents ?? catalog.agents.length) + (remoteTotals.music ?? catalog.music.length) + (remoteTotals.medals ?? catalog.medals.length);
 
   function flash(message: string) {
     setNotice(message);
@@ -576,9 +579,45 @@ export default function SkinChangerPage() {
 
   return <main className={`page-wrap changer-page pro-changer-page ${steamAuthed === false ? "skinchanger-locked" : ""}`}>
     {steamAuthed === false && <div className="steam-skin-gate"><div className="steam-skin-gate-card"><span><Icon name="steam" size={28} /></span><small>WINGS LOADOUT ACCESS</small><strong>STEAM LOGIN REQUIRED</strong><p>Skin Changer болон SteamID64-д хадгалагдах loadout ашиглахын тулд Steam-ээр нэвтэрнэ үү.</p><a href="/login">SIGN IN WITH STEAM <Icon name="arrow" size={15} /></a></div></div>}
-    <PageHeading icon="skin" eyebrow="LIVE COSMETIC STUDIO" title="SKIN CHANGER" description="Steam-д холбогдсон personal loadout" />
+    <PageHeading icon="skin" eyebrow="LIVE COSMETIC STUDIO" title="SKIN CHANGER" description="Steam-д холбогдсон personal loadout · craft studio · team loadout" />
 
-    <section className="catalog-status-strip">
+    <section className="skin-v4-hero">
+      <article className="skin-v4-hero-main">
+        <div className="skin-v4-copy">
+          <span>WINGS LOADOUT LAB / {side}</span>
+          <h2>Build it. Preview it. Equip it.</h2>
+          <p>Үндсэн loadout flow-г хэвээр үлдээгээд, илүү premium studio hierarchy, quick status, selected-item preview болон craft focus нэмлээ.</p>
+          <div className="skin-v4-actions">
+            <button onClick={() => { setCategory("Skins"); setGroup("ALL"); setBoardView("loadout"); setBoardQuery(""); }}>OPEN LOADOUT</button>
+            <button className="ghost" onClick={() => openSpecialCategory("Knives", side)}>KNIVES</button>
+            <button className="ghost" onClick={() => openSpecialCategory("Agents", side)}>AGENTS</button>
+          </div>
+        </div>
+        <div className="skin-v4-focus" style={activeLoadoutItem ? rarityStyle(activeLoadoutItem) : undefined}>
+          <div className="skin-v4-focus-top"><span>ACTIVE PREVIEW</span><b>{activeLoadoutItem?.rarity ?? "DEFAULT"}</b></div>
+          <div className="skin-v4-focus-art">
+            {activeLoadoutItem ? <CatalogThumb item={activeLoadoutItem} className="skin-v4-focus-thumb" /> : <span className="skin-v4-empty-mark"><Icon name="skin" size={34} /></span>}
+          </div>
+          <strong>{activeLoadoutItem ? cleanName(activeLoadoutItem) : `${side} LOADOUT`}</strong>
+          <small>{activeLoadoutItem?.weapon || `${equippedCount} equipped items`}</small>
+        </div>
+      </article>
+
+      <aside className="skin-v4-hero-side">
+        <div className="skin-v4-metric-grid">
+          <article><span>Equipped</span><strong>{equippedCount}</strong><small>{side} side</small></article>
+          <article><span>Catalog</span><strong>{catalogTotal.toLocaleString()}</strong><small>{catalogState}</small></article>
+          <article><span>Weapon slots</span><strong>{teamSlotCount}</strong><small>available</small></article>
+          <article><span>Steam</span><strong>{steamAuthed ? "LINKED" : "LOGIN"}</strong><small>{steamId64 ? steamId64.slice(-6) : "identity"}</small></article>
+        </div>
+        <div className="skin-v4-side-switch">
+          <button className={side === "CT" ? "active ct" : "ct"} onClick={() => switchSide("CT")}><span>CT</span><strong>{sideCount("CT")}</strong></button>
+          <button className={side === "T" ? "active t" : "t"} onClick={() => switchSide("T")}><span>T</span><strong>{sideCount("T")}</strong></button>
+        </div>
+      </aside>
+    </section>
+
+    <section className="catalog-status-strip skin-v4-status-strip">
       <div><i className={catalogState} /><span>{catalogState === "live" ? "LIVE CS2 CATALOG" : catalogState === "loading" ? "CATALOG SYNCING" : "LOCAL CATALOG"}</span></div>
       <div><span>SIDE</span><strong>{side}</strong><b /> <span>LOADOUT</span><strong>{equippedCount}</strong><b /> <span>SKINS</span><strong>{remoteTotals.skins ?? catalog.skins.length}</strong><b /> <span>STICKERS</span><strong>{remoteTotals.stickers ?? catalog.stickers.length}</strong></div>
     </section>

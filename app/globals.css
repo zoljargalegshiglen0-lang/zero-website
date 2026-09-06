@@ -1772,3 +1772,833 @@ body.cosmic-shell{
     font-size: 24px;
   }
 }
+
+/* ===== WINGS V4 / SKIN STUDIO + ADMIN COMMAND CENTER ===== */
+.skin-v4-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(320px, .8fr);
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.skin-v4-hero-main,
+.skin-v4-hero-side,
+.admin-v4-hero,
+.admin-v4-health-grid article,
+.admin-v4-action-card,
+.admin-v4-panel {
+  border: 1px solid rgba(255,255,255,.08);
+  background:
+    radial-gradient(circle at top left, rgba(112,82,255,.16), transparent 36%),
+    linear-gradient(180deg, rgba(13,16,30,.97), rgba(8,10,19,.98));
+  box-shadow: 0 20px 55px rgba(0,0,0,.30);
+}
+
+.skin-v4-hero-main {
+  min-height: 300px;
+  padding: 26px;
+  border-radius: 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(250px, .75fr);
+  gap: 22px;
+  align-items: stretch;
+  overflow: hidden;
+  position: relative;
+}
+
+.skin-v4-hero-main::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 52%, rgba(255,76,112,.06));
+  pointer-events: none;
+}
+
+.skin-v4-copy,
+.skin-v4-focus {
+  position: relative;
+  z-index: 1;
+}
+
+.skin-v4-copy > span,
+.skin-v4-focus-top span,
+.skin-v4-metric-grid span,
+.admin-v4-copy > span,
+.admin-v4-metrics span,
+.admin-v4-health-grid span,
+.admin-v4-action-top span,
+.admin-v4-panel-head span {
+  color: #8fa2ff;
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.skin-v4-copy h2,
+.admin-v4-copy h2 {
+  margin: 12px 0 10px;
+  color: #fff;
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1.02;
+  letter-spacing: -.035em;
+}
+
+.skin-v4-copy p,
+.admin-v4-copy p,
+.admin-v4-action-card p,
+.admin-v4-panel small {
+  color: rgba(255,255,255,.68);
+  line-height: 1.7;
+}
+
+.skin-v4-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.skin-v4-actions button {
+  min-height: 42px;
+  padding: 0 15px;
+  border-radius: 13px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: linear-gradient(135deg,#6d4dff,#ef4265);
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+.skin-v4-actions button.ghost {
+  background: rgba(255,255,255,.035);
+  color: #dfe4f7;
+}
+
+.skin-v4-focus {
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid color-mix(in srgb, var(--item-color, #8273ff) 35%, transparent);
+  background:
+    radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--item-color, #8273ff) 24%, transparent), transparent 48%),
+    rgba(255,255,255,.025);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.skin-v4-focus-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.skin-v4-focus-top b {
+  color: var(--item-color, #a798ff);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.skin-v4-focus-art {
+  min-height: 142px;
+  display: grid;
+  place-items: center;
+}
+
+.skin-v4-focus-thumb {
+  width: 180px !important;
+  height: 116px !important;
+  border-radius: 18px;
+  background: rgba(6,8,16,.65);
+}
+
+.skin-v4-focus-thumb img {
+  max-width: 92%;
+  max-height: 92%;
+  object-fit: contain;
+}
+
+.skin-v4-empty-mark {
+  width: 88px;
+  height: 88px;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  color: #a49aff;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.skin-v4-focus > strong {
+  color: #fff;
+  font-size: 20px;
+}
+
+.skin-v4-focus > small {
+  color: rgba(255,255,255,.55);
+  margin-top: 4px;
+}
+
+.skin-v4-hero-side {
+  padding: 18px;
+  border-radius: 28px;
+  display: grid;
+  gap: 14px;
+}
+
+.skin-v4-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 12px;
+}
+
+.skin-v4-metric-grid article {
+  min-height: 104px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+}
+
+.skin-v4-metric-grid strong {
+  display: block;
+  margin-top: 7px;
+  color: #fff;
+  font-size: 24px;
+}
+
+.skin-v4-metric-grid small {
+  display: block;
+  margin-top: 4px;
+  color: rgba(255,255,255,.50);
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+
+.skin-v4-side-switch {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 10px;
+}
+
+.skin-v4-side-switch button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+  padding: 0 15px;
+  border-radius: 15px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+  color: rgba(255,255,255,.66);
+}
+
+.skin-v4-side-switch button.active.ct {
+  color: #bfe9ff;
+  border-color: rgba(89,184,255,.34);
+  background: rgba(46,131,196,.15);
+}
+
+.skin-v4-side-switch button.active.t {
+  color: #ffd59b;
+  border-color: rgba(255,180,74,.34);
+  background: rgba(179,113,30,.15);
+}
+
+.skin-v4-side-switch strong {
+  font-size: 20px;
+}
+
+.skin-v4-status-strip {
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.07);
+  background: rgba(255,255,255,.025);
+}
+
+.pro-changer-page .pro-loadout-shell,
+.pro-changer-page .loadout-team-toggle,
+.pro-changer-page .pro-browser-shell,
+.pro-changer-page .pro-editor-modal {
+  border-color: rgba(255,255,255,.08) !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,.28);
+}
+
+.pro-changer-page .pro-item-card {
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.015));
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.pro-changer-page .pro-item-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--item-color, #8171ff) 45%, rgba(255,255,255,.08));
+  box-shadow: 0 14px 28px rgba(0,0,0,.24);
+}
+
+.pro-changer-page .team-side-card,
+.pro-changer-page .side-special-card,
+.pro-changer-page .catalog-item,
+.pro-changer-page .pro-accessory-item {
+  border-radius: 16px;
+}
+
+.pro-changer-page .catalog-tabs,
+.pro-changer-page .pro-toolbar,
+.pro-changer-page .team-loadout-switch {
+  backdrop-filter: blur(14px);
+}
+
+.admin-v4-page {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-v4-hero {
+  display: grid;
+  grid-template-columns: minmax(0,1.25fr) minmax(420px,.9fr);
+  gap: 20px;
+  padding: 26px;
+  border-radius: 28px;
+}
+
+.admin-v4-session {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 11px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+}
+
+.admin-v4-session > i {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: linear-gradient(135deg,rgba(108,76,255,.5),rgba(239,66,101,.24));
+  color: #fff;
+}
+
+.admin-v4-session span {
+  display: block;
+  color: rgba(255,255,255,.5);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+
+.admin-v4-session strong {
+  color: #fff;
+}
+
+.admin-v4-session > b {
+  margin-left: 10px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(122,108,255,.14);
+  color: #bdb5ff;
+  font-size: 10px;
+  letter-spacing: .14em;
+}
+
+.admin-v4-metrics {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 12px;
+}
+
+.admin-v4-metrics article {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+}
+
+.admin-v4-metrics strong {
+  display: block;
+  margin-top: 6px;
+  color: #fff;
+  font-size: 28px;
+}
+
+.admin-v4-metrics small {
+  display: block;
+  margin-top: 4px;
+  color: rgba(255,255,255,.48);
+}
+
+.admin-v4-health-grid {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 14px;
+}
+
+.admin-v4-health-grid article {
+  display: grid;
+  grid-template-columns: 44px minmax(0,1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 16px;
+  border-radius: 20px;
+}
+
+.admin-v4-health-grid article > i {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  color: #fff;
+  background: rgba(255,255,255,.05);
+}
+
+.admin-v4-health-grid strong {
+  display: block;
+  margin-top: 4px;
+  color: #fff;
+}
+
+.admin-v4-health-grid small {
+  display: block;
+  margin-top: 3px;
+  color: rgba(255,255,255,.48);
+}
+
+.admin-v4-health-grid article > b {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #ffc36b;
+  box-shadow: 0 0 14px rgba(255,195,107,.45);
+}
+
+.admin-v4-health-grid article.ready > b {
+  background: #62e6a5;
+  box-shadow: 0 0 14px rgba(98,230,165,.48);
+}
+
+.admin-v4-actions {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 14px;
+}
+
+.admin-v4-action-card {
+  min-height: 180px;
+  padding: 18px;
+  border-radius: 22px;
+  transition: transform .18s ease, border-color .18s ease;
+}
+
+.admin-v4-action-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(136,116,255,.30);
+}
+
+.admin-v4-action-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-v4-action-card > i {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  margin: 18px 0 14px;
+  border-radius: 15px;
+  background: linear-gradient(135deg,rgba(108,76,255,.48),rgba(239,66,101,.22));
+  color: #fff;
+}
+
+.admin-v4-action-card > strong {
+  color: #fff;
+  font-size: 18px;
+}
+
+.admin-v4-action-card p {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.admin-v4-grid {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 16px;
+}
+
+.admin-v4-panel {
+  padding: 22px;
+  border-radius: 24px;
+}
+
+.admin-v4-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.admin-v4-panel-head h2 {
+  margin: 7px 0 0;
+  color: #fff;
+  font-size: 25px;
+}
+
+.admin-v4-panel-head a {
+  color: #d8ddff;
+  font-size: 12px;
+}
+
+.admin-v4-small-badge {
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+}
+
+.admin-v4-status-list,
+.admin-v4-checklist {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-v4-status-list article,
+.admin-v4-checklist article {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.07);
+  background: rgba(255,255,255,.025);
+}
+
+.admin-v4-status-list article > div,
+.admin-v4-checklist article > div {
+  min-width: 0;
+}
+
+.admin-v4-status-list strong,
+.admin-v4-checklist strong {
+  display: block;
+  color: #fff;
+}
+
+.admin-v4-status-list small,
+.admin-v4-checklist small {
+  display: block;
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-v4-status-list article > b {
+  margin-left: auto;
+  color: #a99cff;
+  font-size: 11px;
+  letter-spacing: .12em;
+}
+
+.admin-v4-checklist svg {
+  flex: 0 0 auto;
+  color: #66e7aa;
+}
+
+.admin-v4-page .wings-config-manager,
+.admin-v4-page .admin-staff-shell {
+  margin-top: 4px;
+}
+
+.admin-v4-page .wings-config-head,
+.admin-v4-page .wings-config-panel,
+.admin-v4-page .wings-admin-manager-head,
+.admin-v4-page .admin-form-panel,
+.admin-v4-page .admin-list-panel {
+  border-radius: 24px;
+  border-color: rgba(255,255,255,.08);
+  background: linear-gradient(180deg,rgba(13,16,30,.97),rgba(8,10,19,.98));
+}
+
+.admin-v4-page .wings-config-panel input,
+.admin-v4-page .wings-config-panel textarea,
+.admin-v4-page .wings-config-panel select,
+.admin-v4-page .admin-form input,
+.admin-v4-page .admin-form textarea,
+.admin-v4-page .admin-form select {
+  border-color: rgba(255,255,255,.08);
+  background: rgba(255,255,255,.035);
+}
+
+@media (max-width: 1180px) {
+  .skin-v4-hero,
+  .admin-v4-hero,
+  .admin-v4-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-v4-health-grid,
+  .admin-v4-actions {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .skin-v4-hero-main,
+  .admin-v4-hero {
+    grid-template-columns: 1fr;
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .skin-v4-metric-grid,
+  .admin-v4-metrics,
+  .admin-v4-health-grid,
+  .admin-v4-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .skin-v4-focus-art {
+    min-height: 118px;
+  }
+}
+
+.wings-route-loading,
+.wings-not-found {
+  min-height: 62vh;
+  display: grid;
+  place-items: center;
+}
+
+.wings-route-loader,
+.wings-not-found > section {
+  width: min(520px, 100%);
+  padding: 34px;
+  border-radius: 26px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: linear-gradient(180deg,rgba(13,16,30,.97),rgba(8,10,19,.98));
+  box-shadow: 0 22px 60px rgba(0,0,0,.32);
+}
+
+.wings-route-loader i {
+  display: block;
+  width: 44px;
+  height: 4px;
+  margin-bottom: 18px;
+  border-radius: 999px;
+  background: linear-gradient(90deg,#6d4dff,#ef4265);
+  animation: wings-loader-pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes wings-loader-pulse {
+  from { transform: scaleX(.55); opacity: .5; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+
+.wings-route-loader span,
+.wings-not-found span {
+  color: #8fa2ff;
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.wings-route-loader strong {
+  display: block;
+  margin-top: 8px;
+  color: #fff;
+  font-size: 22px;
+}
+
+.wings-not-found h1 {
+  margin: 10px 0;
+  color: #fff;
+  font-size: clamp(34px,5vw,58px);
+  line-height: 1;
+}
+
+.wings-not-found p {
+  color: rgba(255,255,255,.66);
+  line-height: 1.7;
+}
+
+.wings-not-found section > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.wings-not-found a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 12px;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.035);
+}
+
+/* ===== WINGS V5 MONOCHROME REDESIGN ===== */
+:root{
+  --bg:#050505;
+  --panel:#0b0b0b;
+  --panel2:#111111;
+  --text:#f3f3f3;
+  --muted:#9a9a9a;
+  --line:rgba(255,255,255,.10);
+  --violet:#f1f1f1;
+  --violet2:#ffffff;
+  --cyan:#dbdbdb;
+  --mint:#ffffff;
+  --red:#d8d8d8;
+  --amber:#f4f4f4;
+}
+html,body{background:#050505;color:#f3f3f3}
+body.cosmic-shell{
+  background:
+    radial-gradient(circle at top center, rgba(255,255,255,.05), transparent 28%),
+    linear-gradient(180deg, #070707 0%, #030303 100%);
+}
+a,button{transition:.18s ease}
+
+.status-rail,.neo-utility-rail{
+  background:linear-gradient(90deg,#0a0a0a,#121212,#0a0a0a)!important;
+  color:#a9a9a9!important;
+  border-color:rgba(255,255,255,.08)!important;
+}
+.status-rail i,.live-label i,.neo-live-pill i,.wings-live-pill i{background:#fff!important;box-shadow:0 0 10px rgba(255,255,255,.42)!important}
+
+.site-header,.neo-topbar,.wings-topbar{
+  background:rgba(6,6,6,.92)!important;
+  border-bottom:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:0 20px 44px rgba(0,0,0,.38);
+}
+.logo small,.neo-sidebar-head small,.wings-sidebar-label,.page-eyebrow,.live-label,.neo-kicker,.neo-alert-copy span,.neo-card-topline span,.neo-surface-head span,
+.neo-store-hero span,.neo-membership-hero span,.neo-clan-hero span,.skin-v4-copy span,.skin-v4-focus-top span,.admin-v4-copy span,.admin-v4-panel-head span,
+.admin-v4-action-top span,.admin-v4-health-grid span,.admin-v4-session span,.side-panel-tag,.catalog-status-strip span,.match-loadout-heading>div>span{
+  color:#9b9b9b!important;
+}
+.logo>b,.main-nav>a:hover,.main-nav>a.active,.admin-link.active,.admin-link:hover,.hub-title>span,.heading-orb,.page-heading h1 em,
+.hub-title h2 span,.neo-home-copy h1 em,.neo-card-topline b,.neo-server-meta em,.neo-toprank-card span,.neo-podium-card span,.neo-match-thumb b,
+.skin-v4-focus-top b,.admin-v4-small-badge,.admin-v4-status-list b,.accessory-result-label strong,.preview-meta span{
+  color:#ffffff!important;
+}
+.main-nav>a.active:after,.neo-progress i,.pro-progress i{background:#fff!important}
+.main-nav>a:hover,.main-nav>a.active{background:linear-gradient(180deg,rgba(255,255,255,.07),transparent)!important}
+
+.wings-sidebar,.main-nav,.sidebar-backdrop{backdrop-filter:blur(10px)}
+.wings-sidebar,.loadout-picker-drawer,.pro-editor-modal,.skin-picker-modal,.admin-v4-panel,.neo-surface,.neo-home-hero,.neo-alert-bar,.neo-service-card,
+.neo-board-shell,.neo-clan-hero,.neo-membership-hero,.neo-store-hero,.skin-v4-hero,.pro-catalog-board,.cs2-side-panel .side-panel-hero,
+.admin-v4-hero,.admin-v4-action-card,.admin-v4-health-grid article,.neo-toprank-card,.neo-podium-card,.neo-server-card,.neo-match-card,.neo-quick-card,
+.neo-store-roadmap article,.neo-note-list article,.identity-card,.roster-clan,.clan-detail,.player-detail,.stat-card,.content-card,.toolbar,.data-panel,
+.quick-panel,.feature-tile,.match-loadout-board,.selected-base-chip,.placement-card,.pro-accessory-item,.store-empty-state,.neo-store-empty,
+.connection-ready-empty,.empty-box,.board-empty,.rail-empty,.accessory-empty,.steam-skin-gate-card{
+  background:linear-gradient(180deg,rgba(15,15,15,.98),rgba(8,8,8,.98))!important;
+  border-color:rgba(255,255,255,.09)!important;
+  box-shadow:none!important;
+}
+
+.home-art:after,.feature-tile:after,.neo-home-hero::after,.catalog-thumb>b,.preview-grid,.fake-3d-depth,.preview-sticker-dot:before{display:none!important}
+.home-art,.neo-server-thumb,.neo-match-thumb,.side-panel-hero,.skin-v4-focus-art{
+  filter:grayscale(1) contrast(1.02);
+}
+
+.primary-button,.neo-primary-link,.page-button,.admin-link,.steam-action,.wings-topbar-button,.wings-topbar-discord,.neo-ghost-link,
+.neo-discord-link,.neo-outline-link,.neo-match-actions button,.save-craft,.reset-3d,.catalog-more,.loadout-back-button,.rail-settings,.card-settings,
+.filter-chip.active,.level-reset.active,.level-chip.selected,.catalog-view-switch>button.active,.pro-group-tabs>button.active,.loadout-shortcuts button.active,
+.team-loadout-switch button.active,.loadout-team-toggle button.active,.skin-v4-side-switch button.active,.site-config-tabs button.active,.admin-v4-session b{
+  background:#ffffff!important;
+  color:#090909!important;
+  border:1px solid #ffffff!important;
+  box-shadow:none!important;
+}
+.primary-button:hover,.neo-primary-link:hover,.page-button:hover,.wings-topbar-button:hover,.wings-topbar-discord:hover,.neo-ghost-link:hover,
+.neo-discord-link:hover,.neo-outline-link:hover,.neo-match-actions button:hover,.save-craft:hover,.catalog-more:hover,.filter-chip:hover,.level-chip:hover,
+.catalog-view-switch>button:hover,.pro-group-tabs>button:hover,.loadout-shortcuts button:hover,.team-loadout-switch button:hover,.loadout-team-toggle button:hover,
+.skin-v4-side-switch button:hover,.admin-v4-action-card:hover,.neo-service-card:hover,.neo-quick-card:hover,.neo-server-card:hover,.neo-match-card:hover{
+  transform:translateY(-1px);
+  background:#e7e7e7!important;
+  color:#050505!important;
+}
+
+.ghost-button,.search-box,.wings-searchbox,.neo-searchbox,.loadout-picker-drawer>header>button,.name-tag-field input,.pro-search,
+.pro-editor-range input,.charm-row button,.charm-row>button,.site-config-tabs button,.site-config-card input,.site-config-card textarea,
+.site-config-card select,.staff-row-actions button,.pro-sticker-slots button,.match-loadout-slot,.pro-item-card,.pro-skin-row,
+.pro-accessory-item,.collection-categories button,.collection-search,.filter-chip,.level-chip,.level-reset,.catalog-view-switch>button,
+.pro-group-tabs>button,.loadout-shortcuts button,.team-loadout-switch button,.loadout-team-toggle button,.skin-v4-side-switch button,
+.neo-outline-link.inline,.wings-profile-chip,.wings-sidebar-discord,.selected-base-chip,.roster-clan,.identity-card button,.neo-quick-card,
+.neo-service-card,.admin-v4-action-card,.admin-v4-panel-head a,.admin-v4-status-list article,.admin-v4-checklist article,.admin-v4-health-grid article,
+.neo-clan-detail button,.pro-board-toolbar,.toolbar.neo-toolbar,.collection-categories button{
+  background:rgba(255,255,255,.02)!important;
+  color:#f2f2f2!important;
+  border-color:rgba(255,255,255,.10)!important;
+}
+.search-box input,.wings-searchbox input,.neo-searchbox input,.collection-search input,.pro-search input,.name-tag-field input{color:#fff!important}
+.search-box input::placeholder,.wings-searchbox input::placeholder,.neo-searchbox input::placeholder,.collection-search input::placeholder,.pro-search input::placeholder,.name-tag-field input::placeholder{color:#7f7f7f!important}
+
+.neo-home-copy h1,.page-heading h1,.hub-title h2,.skin-v4-copy h1,.admin-v4-copy h2,.neo-clan-hero h2,.neo-membership-hero h2,.neo-store-hero h2,
+.neo-surface-head h2,.pro-board-toolbar strong,.detail-level strong,.clan-detail h2,.player-detail h2{color:#fff!important}
+.home-copy p,.hub-title p,.page-heading p,.neo-home-copy p,.neo-alert-copy p,.neo-brand-board p,.neo-queue-line small,.neo-service-card p,.neo-server-card small,
+.neo-note-list article span,.neo-store-roadmap p,.neo-toprank-card p,.neo-podium-card p,.neo-mini-feed-list span,.neo-mini-feed-list b,
+.admin-v4-copy p,.admin-v4-action-card p,.admin-v4-status-list small,.admin-v4-checklist small,.skin-v4-copy p,.skin-v4-status-strip p,
+.side-panel-copy p,.roster-clan small,.identity-card ul li,.collection-control span,.collection-control h2,.store-empty-state span{color:#b6b6b6!important}
+
+.feature-icon,.stat-card>i,.heading-orb,.neo-stat-ribbon i,.neo-service-card i,.neo-quick-card i,.wings-sidebar-nav i,.wings-sidebar-discord-icon,
+.skin-v4-focus-thumb,.skin-v4-empty-mark,.admin-v4-session i{
+  background:#121212!important;
+  color:#ffffff!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+}
+
+.neo-brand-mark,.detail-avatar,.clan-detail-mark,.identity-mark,.steam-header-fallback,.wings-brand-mark,.logo-mark,
+.item-aurora-glyph,.catalog-thumb,.loadout-slot-mark,.preview-core{
+  background:#111111!important;
+  color:#ffffff!important;
+  border-color:rgba(255,255,255,.10)!important;
+}
+.neo-brand-mark img,.wings-brand-mark img,.logo-mark img{filter:grayscale(1) brightness(1.2)}
+
+.data-row,.data-header,.match-loadout-section>header>span,.match-loadout-slot>span:nth-child(2)>small,.match-loadout-heading>small,
+.side-panel-copy small,.side-panel-specials small,.catalog-status-strip small,.selected-base-chip em,.selected-base-chip small{
+  color:#a4a4a4!important;
+}
+.data-row,.data-panel,.toolbar,.page-heading,.site-footer,.site-footer nav a,.admin-v4-status-list article,.admin-v4-checklist article,
+.match-loadout-heading,.pro-board-toolbar,.skin-v4-focus,.skin-v4-hero-main,.skin-v4-hero-side,.skin-v4-metric-grid article,.pro-editor-heading,
+.pro-editor-controls,.pro-accessory-catalog,.selected-base-chip,.drawer-skin-grid .pro-skin-row,.pro-item-card,.match-loadout-slot,
+.wings-sidebar-nav a,.wings-sidebar-discord,.neo-server-card,.neo-match-card,.neo-quick-card,.neo-service-card,.neo-surface,.neo-home-hero,
+.neo-alert-bar,.neo-board-shell,.neo-store-empty,.identity-card,.roster-clan,.clan-detail,.player-detail,.admin-v4-panel{
+  border-radius:18px!important;
+}
+
+.catalog-status-strip,.skin-v4-status-strip,.skin-v4-metric-grid article,.admin-v4-metrics article,.neo-stat-ribbon article,.neo-board-stats article,
+.neo-live-summary div,.neo-clan-hero-stats article,.neo-store-info,.neo-membership-preview,.player-metrics div,.clan-detail-stats div{
+  background:#0f0f0f!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
+
+.wings-sidebar-nav a.active,.wings-sidebar-nav a:hover,.neo-server-meta em,.status-online,.status-offline,.ready,.optional,
+.recent-results i,.clan-activity i,.match-loadout-slot.equipped>i,.wings-nav-badge{
+  background:#ffffff!important;
+  color:#060606!important;
+  box-shadow:none!important;
+}
+.wings-nav-badge{border-radius:999px;padding:2px 8px;font-size:10px}
+.status-online i,.status-offline i{background:#050505!important}
+
+.site-footer,.wings-site-footer{background:#050505!important;color:#b4b4b4!important}
+.site-footer nav a:hover{color:#fff!important}
+
+@media(max-width:820px){
+  .wings-topbar-right{gap:8px}
+  .wings-topbar-discord span{display:none}
+}

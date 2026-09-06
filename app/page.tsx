@@ -102,7 +102,7 @@ export default async function Home() {
               <b>{liveServers.length ? "REAL DATA" : "FALLBACK MODE"}</b>
             </div>
             <div className="neo-brand-board">
-              <div className="neo-brand-mark"><img src="/wings-mark.svg" alt="WINGS" /></div>
+              <div className="neo-brand-mark"><img src="/wings-mark-mono.svg" alt="WINGS" /></div>
               <div>
                 <strong>WINGS</strong>
                 <p>Play sharp. Build your stack. Keep your hub responsive.</p>
